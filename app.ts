@@ -15,7 +15,7 @@ app.use(morgan("dev"));
 app.use("/api/users", userRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/task-lists", taskListRouter);
-app.use("/api/", (req, res) => {
+app.use("/", (req, res) => {
   res.status(200).send("welcome to RSO-KEEP!");
 });
 

@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
-import { creatTaskList } from "../services/taskList.service";
+import {
+  creatTaskList,
+  getAllTaskListOfUser,
+} from "../services/taskList.service";
 
 export const handleCreateTaskList = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -10,6 +12,21 @@ export const handleCreateTaskList = catchAsync(
       status: "success",
       data: {
         taskList,
+      },
+    });
+  }
+);
+
+export const handleGetAllTaskListOfUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { userId } = req.params;
+    console.log(userId, "handler");
+    const taskLists = await getAllTaskListOfUser(userId);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        taskLists,
       },
     });
   }

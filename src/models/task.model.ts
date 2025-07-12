@@ -18,7 +18,7 @@ const taskSchema = new Schema<ITask>(
     taskList: {
       type: Schema.Types.ObjectId,
       ref: "TaskList",
-      required: [true, "task must belong to departmen"],
+      required: [true, "task must belong to task list"],
     },
     assignedTo: {
       type: Schema.Types.ObjectId,
@@ -38,5 +38,11 @@ const taskSchema = new Schema<ITask>(
   },
   { timestamps: true }
 );
+
+taskSchema.pre(/^find/, function (next) {
+  // @ts-ignore
+  this.where({ active: { $ne: false } });
+  next();
+});
 
 export const Task = model<ITask>("Task", taskSchema);

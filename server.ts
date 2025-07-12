@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-dotenv.config({ path: "./config.env" });
+// dotenv.config({ path: "./config.env" });
 
 import app from "./app";
-const PORT = process.env.PORT || 3000;
-const DB_URL = process.env.DATABASE_URL;
+const PORT = 3000;
+const DB_URL = "mongodb://127.0.0.1:27017/RSO-KEEP";
 
 if (!DB_URL) {
   throw new Error("Database Url is not Defined");
