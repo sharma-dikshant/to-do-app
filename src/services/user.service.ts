@@ -4,7 +4,6 @@ interface CreateUserInput {
   name: string;
   email: string;
   password: string;
-  role?: string;
 }
 
 export const createUser = async (data: CreateUserInput): Promise<IUser> => {

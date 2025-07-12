@@ -1,23 +1,22 @@
 import { Request, Response, NextFunction } from "express";
-import { createUser } from "../services/user.service";
+import { creatTaskList } from "../services/taskList.service";
 
-export const handleCreateUser = async (
+export const handleCreateTaskList = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const user = await createUser(req.body);
-
-    res.status(201).json({
+    const taskList = await creatTaskList(req.body);
+    res.status(200).json({
       status: "success",
       data: {
-        user,
+        taskList,
       },
     });
   } catch (error: any) {
     res.status(400).json({
-      status: "error",
+      status: "failed",
       message: error.message,
     });
   }
