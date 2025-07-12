@@ -1,12 +1,10 @@
 import { Request, Response, NextFunction } from "express";
+import AppError from "../utils/appError";
+import catchAsync from "../utils/catchAsync";
 import { creatTaskList } from "../services/taskList.service";
 
-export const handleCreateTaskList = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+export const handleCreateTaskList = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const taskList = await creatTaskList(req.body);
     res.status(200).json({
       status: "success",
@@ -14,10 +12,5 @@ export const handleCreateTaskList = async (
         taskList,
       },
     });
-  } catch (error: any) {
-    res.status(400).json({
-      status: "failed",
-      message: error.message,
-    });
   }
-};
+);
