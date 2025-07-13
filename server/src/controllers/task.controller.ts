@@ -10,16 +10,12 @@ import {
 } from "../services/task.service";
 import { isValidObjectId, Types } from "mongoose";
 import { AuthenticatedRequest } from "../types";
+import APIResponse from "../utils/apiResponse";
 
 export const handleCreate = catchAsync(
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const task = await createTask({ ...req.body, user: req.user._id });
-    res.status(200).json({
-      status: "success",
-      data: {
-        task,
-      },
-    });
+    return new APIResponse(200, "success", task).send(res);
   }
 );
 
@@ -57,24 +53,14 @@ export const handleUpdateBasicDetails = catchAsync(
 
     const task = await updateTask(req.params.taskId, updateData);
 
-    res.status(200).json({
-      status: "success",
-      data: {
-        task,
-      },
-    });
+    return new APIResponse(200, "success", task).send(res);
   }
 );
 
 export const handleGetAllTasks = catchAsync(
   async (req: Response, res: Response, next: NextFunction) => {
     const tasks = await getAllTask();
-    res.status(200).json({
-      status: "success",
-      data: {
-        tasks,
-      },
-    });
+    return new APIResponse(200, "success", tasks).send(res);
   }
 );
 
@@ -86,12 +72,7 @@ export const handleGetAllTasksOfTaskList = catchAsync(
     }
 
     const tasks = await getAllTaskOfTaskList(taskListId);
-    res.status(200).json({
-      status: "success",
-      data: {
-        tasks,
-      },
-    });
+    return new APIResponse(200, "success", tasks).send(res);
   }
 );
 
@@ -100,8 +81,6 @@ export const handleSoftDeleteTask = catchAsync(
     const { taskId } = req.params;
     await softDeleteTask(taskId);
 
-    res.status(204).json({
-      status: "success",
-    });
+    return new APIResponse(204, "success", null).send(res);
   }
 );

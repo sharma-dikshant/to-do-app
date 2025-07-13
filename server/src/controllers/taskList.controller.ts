@@ -4,30 +4,19 @@ import {
   creatTaskList,
   getAllTaskListOfUser,
 } from "../services/taskList.service";
+import APIResponse from "../utils/apiResponse";
 
 export const handleCreateTaskList = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const taskList = await creatTaskList(req.body);
-    res.status(200).json({
-      status: "success",
-      data: {
-        taskList,
-      },
-    });
+    return new APIResponse(200, "success", taskList).send(res);
   }
 );
 
 export const handleGetAllTaskListOfUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
-    console.log(userId, "handler");
     const taskLists = await getAllTaskListOfUser(userId);
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        taskLists,
-      },
-    });
+    return new APIResponse(200, "success", taskLists).send(res);
   }
 );
