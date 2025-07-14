@@ -5,10 +5,11 @@ import {
   getAllTaskListOfUser,
 } from "../services/taskList.service";
 import APIResponse from "../utils/apiResponse";
+import { AuthenticatedRequest } from "../types";
 
 export const handleCreateTaskList = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const taskList = await creatTaskList(req.body);
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const taskList = await creatTaskList({ ...req.body, user: req.user._id });
     return new APIResponse(200, "success", taskList).send(res);
   }
 );

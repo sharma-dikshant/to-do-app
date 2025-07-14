@@ -6,10 +6,15 @@ import {
   ListItemText,
   Divider,
   Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material";
 import {
   Add,
-  Search,
   Inbox,
   Today,
   CalendarMonth,
@@ -19,114 +24,160 @@ import {
   Help,
   Tag,
 } from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import API_SERVICES from "../services/apiServices";
 
-function Sidebar({ setSelectedOption, selectedOption }) {
+function Sidebar({ setSelectedOption, selectedOption, setSelectedList }) {
+  const [taskLists, setTaskList] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newListName, setNewListName] = useState("");
+
+  useEffect(() => {
+    //TODO Replace with dynamic user ID if needed
+    API_SERVICES.TASK_LIST.ALL_LIST_OF_USER(
+      "687211c6b451258d5cc9b045",
+      setTaskList
+    );
+  }, []);
+
+  function handleCreateNewTaskList() {
+    if (!newListName.trim()) return;
+    const data = { name: newListName };
+    API_SERVICES.TASK_LIST.CREATE(setTaskList, data);
+    newListName("");
+  }
+
   return (
-    <Box sx={{ p: 2 }}>
-      <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-        Dikshant
-      </Typography>
+    <>
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+          Dikshant
+        </Typography>
 
-      <List>
-        {/* add new task list  */}
-        <ListItemButton
-          selected={selectedOption === "new-task-list"}
-          onClick={() => setSelectedOption("new-task-list")}
-        >
-          <ListItemIcon>
-            <Add />
-          </ListItemIcon>
-          <ListItemText primary="Add TaskList" />
-        </ListItemButton>
+        <List>
+          {/* Add new task list */}
+          <ListItemButton
+            selected={selectedOption === "new-task-list"}
+            onClick={() => {
+              setOpenDialog(true);
+              setSelectedOption("new-task-list");
+            }}
+          >
+            <ListItemIcon>
+              <Add />
+            </ListItemIcon>
+            <ListItemText primary="Add TaskList" />
+          </ListItemButton>
 
-        {/* search task list  */}
+          {/* Task Lists */}
+          {taskLists.map((taskList, i) => (
+            <ListItemButton
+              selected={selectedOption === taskList.name}
+              onClick={() => {
+                setSelectedOption(taskList.name);
+                setSelectedList(taskList);
+              }}
+              key={i}
+            >
+              <ListItemIcon>
+                <Inbox />
+              </ListItemIcon>
+              <ListItemText primary={taskList.name} secondary="2" />
+            </ListItemButton>
+          ))}
 
-        {/* <ListItemButton>
-          <ListItemIcon>
-            <Search />
-          </ListItemIcon>
-          <ListItemText primary="Search" />
-        </ListItemButton> */}
+          {/* Today */}
+          <ListItemButton
+            selected={selectedOption === "today"}
+            onClick={() => setSelectedOption("today")}
+          >
+            <ListItemIcon>
+              <Today />
+            </ListItemIcon>
+            <ListItemText primary="Today" secondary="2" />
+          </ListItemButton>
 
-        {/* Task Lists  */}
-        <ListItemButton
-          selected={selectedOption === "task-list"}
-          onClick={() => setSelectedOption("task-list")}
-        >
-          <ListItemIcon>
-            <Inbox />
-          </ListItemIcon>
-          <ListItemText primary="Task List 1" secondary="2" />
-        </ListItemButton>
+          {/* Upcoming */}
+          <ListItemButton
+            selected={selectedOption === "calender"}
+            onClick={() => setSelectedOption("calender")}
+          >
+            <ListItemIcon>
+              <CalendarMonth />
+            </ListItemIcon>
+            <ListItemText primary="Upcoming" />
+          </ListItemButton>
 
-        {/* today  */}
-        <ListItemButton
-          selected={selectedOption === "today"}
-          onClick={() => setSelectedOption("today")}
-        >
-          <ListItemIcon>
-            <Today />
-          </ListItemIcon>
-          <ListItemText primary="Today" secondary="2" />
-        </ListItemButton>
+          {/* Completed */}
+          <ListItemButton>
+            <ListItemIcon>
+              <CheckCircle />
+            </ListItemIcon>
+            <ListItemText primary="Completed" />
+          </ListItemButton>
 
-        {/* upcoming  */}
-        <ListItemButton
-          selected={selectedOption === "calender"}
-          onClick={() => setSelectedOption("calender")}
-        >
-          <ListItemIcon>
-            <CalendarMonth />
-          </ListItemIcon>
-          <ListItemText primary="Upcoming" />
-        </ListItemButton>
+          {/* More */}
+          <ListItemButton>
+            <ListItemIcon>
+              <MoreHoriz />
+            </ListItemIcon>
+            <ListItemText primary="More" />
+          </ListItemButton>
+        </List>
 
-        {/* completed  */}
-        <ListItemButton>
-          <ListItemIcon>
-            <CheckCircle />
-          </ListItemIcon>
-          <ListItemText primary="Completed" />
-        </ListItemButton>
+        <Divider sx={{ my: 2 }} />
+        <Typography variant="subtitle2" sx={{ ml: 2, mb: 1 }}>
+          My Projects
+        </Typography>
+        <List>
+          <ListItemButton>
+            <ListItemIcon>
+              <Tag />
+            </ListItemIcon>
+            <ListItemText primary="Getting Started 👋" secondary="13" />
+          </ListItemButton>
+        </List>
 
-        {/* more  */}
-        <ListItemButton>
-          <ListItemIcon>
-            <MoreHoriz />
-          </ListItemIcon>
-          <ListItemText primary="More" />
-        </ListItemButton>
-      </List>
+        <Divider sx={{ my: 2 }} />
+        <List>
+          <ListItemButton>
+            <ListItemIcon>
+              <GroupAdd />
+            </ListItemIcon>
+            <ListItemText primary="Add a team" />
+          </ListItemButton>
+          <ListItemButton>
+            <ListItemIcon>
+              <Help />
+            </ListItemIcon>
+            <ListItemText primary="Help & resources" />
+          </ListItemButton>
+        </List>
+      </Box>
 
-      <Divider sx={{ my: 2 }} />
-      <Typography variant="subtitle2" sx={{ ml: 2, mb: 1 }}>
-        My Projects
-      </Typography>
-      <List>
-        <ListItemButton>
-          <ListItemIcon>
-            <Tag />
-          </ListItemIcon>
-          <ListItemText primary="Getting Started 👋" secondary="13" />
-        </ListItemButton>
-      </List>
-
-      <Divider sx={{ my: 2 }} />
-      <List>
-        <ListItemButton>
-          <ListItemIcon>
-            <GroupAdd />
-          </ListItemIcon>
-          <ListItemText primary="Add a team" />
-        </ListItemButton>
-        <ListItemButton>
-          <ListItemIcon>
-            <Help />
-          </ListItemIcon>
-          <ListItemText primary="Help & resources" />
-        </ListItemButton>
-      </List>
-    </Box>
+      {/* Create New Task List Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Create New Task List</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Task List Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newListName}
+            onChange={(e) => setNewListName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={handleCreateNewTaskList} variant="contained">
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
 

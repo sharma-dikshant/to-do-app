@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "../components/Sidebar";
-import { useLoaderData } from "react-router-dom";
 import Tasks from "../components/Tasks";
 import TaskCalendar from "../components/TaskCalendar";
 
@@ -68,10 +67,9 @@ const drawerWidth = 280;
 function Home() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  // const tasks = useLoaderData(); // [{ name, description }]
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("today");
-
+  const [selectedList, setSelectedList] = useState(null);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -119,13 +117,16 @@ function Home() {
           <Sidebar
             setSelectedOption={setSelectedOption}
             selectedOption={selectedOption}
+            setSelectedList={setSelectedList}
           />
         </Drawer>
       </Box>
 
       {/* Main Content */}
-      {selectedOption === "task-list" && <Tasks tasks={tasks} />}
-      {selectedOption === "today" && <Tasks tasks={tasks} title="today" />}
+      {selectedOption !== "today" && selectedOption !== "calender" && (
+        <Tasks taskList={selectedList} />
+      )}
+      {selectedOption === "today" && <div>Yet to implement</div>}
       {selectedOption === "calender" && (
         <TaskCalendar tasks={tasks} isMobile={isMobile} />
       )}

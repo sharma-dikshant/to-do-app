@@ -22,6 +22,7 @@ import {
   Extension,
 } from "@mui/icons-material";
 import { useState } from "react";
+import EditableTaskTextField from "./EditableTaskTextField";
 
 function formatDueDate(timestamp) {
   const date = new Date(timestamp);
@@ -31,7 +32,12 @@ function formatDueDate(timestamp) {
   });
 }
 
-function TaskItem({ task }) {
+function TaskItem({
+  task,
+  handleDeleteTask,
+  handleCompleteTask,
+  handleUpdateDescription,
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const isOverdue = task.dueDate && task.dueDate < Date.now();
@@ -48,33 +54,33 @@ function TaskItem({ task }) {
         py: 1.5,
         px: 1,
         borderBottom: "1px solid #eee",
-        opacity: task.completed ? 0.5 : 1,
+        opacity: task.complete ? 0.5 : 1,
         "&:hover .hoverMenu": { visibility: "visible" },
       }}
     >
       {/* Left Part: Task Info */}
       <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.2 }}>
         {/* Optional Check Icon Placeholder */}
-        <Box
-          sx={{
-            width: 24,
-            height: 24,
-            border: "1px solid #ccc",
-            borderRadius: "50%",
-            backgroundColor: task.completed ? "#ccc" : "transparent",
-          }}
-        />
+        <button
+          style={{ border: "none", backgroundColor: "inherit" }}
+          onClick={() => handleCompleteTask(task)}
+        >
+          <Box
+            sx={{
+              width: 24,
+              height: 24,
+              border: "1px solid #ccc",
+              borderRadius: "50%",
+              backgroundColor: task.complete ? "#ccc" : "transparent",
+            }}
+          />
+        </button>
 
         <Box>
-          <Typography
-            variant="body1"
-            sx={{
-              textDecoration: task.completed ? "line-through" : "none",
-              fontWeight: 500,
-            }}
-          >
-            {task.description}
-          </Typography>
+          <EditableTaskTextField
+            task={task}
+            handleUpdateDescription={handleUpdateDescription}
+          />
 
           {/* Visual Tags */}
           <Box sx={{ display: "flex", gap: 1, mt: 0.5, flexWrap: "wrap" }}>
@@ -97,7 +103,7 @@ function TaskItem({ task }) {
                 sx={{ bgcolor: "#e3f2fd", color: "#1976d2", borderRadius: 1 }}
               />
             )}
-            {task.completed && (
+            {task.complete && (
               <Chip
                 size="small"
                 label="Completed"
@@ -166,7 +172,10 @@ function TaskItem({ task }) {
             <Extension fontSize="small" sx={{ mr: 1 }} /> Add extension...
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleMenuClose} sx={{ color: "error.main" }}>
+          <MenuItem
+            onClick={() => handleDeleteTask(task._id)}
+            sx={{ color: "error.main" }}
+          >
             <Delete fontSize="small" sx={{ mr: 1 }} /> Delete
           </MenuItem>
         </Menu>
