@@ -6,7 +6,10 @@ export const API_ROUTES = {
     },
     TASK_LIST: {
         CREATE: `${BASE_URL}/api/task-lists`,
-        ALL_LIST_OF_USER: (userId) => `${BASE_URL}/api/task-lists/users/${userId}/all`
+        ALL_LIST_OF_USER: (userId) => `${BASE_URL}/api/task-lists/users/${userId}/all`,
+        SOFT_DELETE: (taskListId) => `${BASE_URL}/api/task-lists/${taskListId}`,
+        RECYCLE_BIN: `${BASE_URL}/api/task-lists/recycle-bin`,
+        RESTORE: (taskListId) => `${BASE_URL}/api/task-lists/restore/${taskListId}`
     }, 
     TASK: {
         CREATE: `${BASE_URL}/api/tasks`,

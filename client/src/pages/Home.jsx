@@ -14,6 +14,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Sidebar from "../components/Sidebar";
 import Tasks from "../components/Tasks";
 import TaskCalendar from "../components/TaskCalendar";
+import TaskListRecycleBIn from "../components/TaskListRecycleBIn";
 
 const tasks = [
   {
@@ -123,9 +124,10 @@ function Home() {
       </Box>
 
       {/* Main Content */}
-      {selectedOption !== "today" && selectedOption !== "calender" && (
-        <Tasks taskList={selectedList} />
-      )}
+      {selectedOption !== "today" &&
+        selectedOption !== "calender" &&
+        selectedOption !== "recycle-bin" && <Tasks taskList={selectedList} />}
+      {selectedOption === "recycle-bin" && <TaskListRecycleBIn />}
       {selectedOption === "today" && <div>Yet to implement</div>}
       {selectedOption === "calender" && (
         <TaskCalendar tasks={tasks} isMobile={isMobile} />

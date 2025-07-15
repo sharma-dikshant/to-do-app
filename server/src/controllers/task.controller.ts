@@ -4,7 +4,6 @@ import AppError from "../utils/appError";
 import {
   createTask,
   getAllTask,
-  getAllTaskOfTaskList,
   softDeleteTask,
   updateTask,
 } from "../services/task.service";
@@ -59,7 +58,7 @@ export const handleUpdateBasicDetails = catchAsync(
 
 export const handleGetAllTasks = catchAsync(
   async (req: Response, res: Response, next: NextFunction) => {
-    const tasks = await getAllTask();
+    const tasks = await getAllTask({});
     return new APIResponse(200, "success", tasks).send(res);
   }
 );
@@ -71,7 +70,7 @@ export const handleGetAllTasksOfTaskList = catchAsync(
       return next(new AppError("invalid task list Id", 400));
     }
 
-    const tasks = await getAllTaskOfTaskList(taskListId);
+    const tasks = await getAllTask({ taskList: taskListId });
     return new APIResponse(200, "success", tasks).send(res);
   }
 );
@@ -82,5 +81,12 @@ export const handleSoftDeleteTask = catchAsync(
     await softDeleteTask(taskId);
 
     return new APIResponse(204, "success", null).send(res);
+  }
+);
+
+export const handleGetAllAssignedTasks = catchAsync(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const tasks = await getAllTask({ assignedTo: req.user._id });
+    return new APIResponse(200, "success", tasks).send(res);
   }
 );

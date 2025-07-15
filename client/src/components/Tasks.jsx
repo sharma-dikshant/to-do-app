@@ -1,6 +1,14 @@
-import { Box, Typography, useTheme, useMediaQuery, Fab } from "@mui/material";
+import {
+  Box,
+  Typography,
+  useTheme,
+  useMediaQuery,
+  Fab,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
 import TaskItem from "./TaskItem";
-import { Add } from "@mui/icons-material";
+import { Add, Delete } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import API_SERVICES from "../services/apiServices";
 
@@ -13,20 +21,20 @@ function Tasks({ taskList }) {
     if (taskList) API_SERVICES.TASK.ALL_TASK_OF_LIST(taskList._id, setTasks);
   }, [taskList]);
 
-  function handleDeleteTask(taskId) {
+  const handleDeleteTask = (taskId) => {
     API_SERVICES.TASK.DELETE(taskId, setTasks);
-  }
+  };
 
-  function handleCompleteTask(task) {
+  const handleCompleteTask = (task) => {
     const isCompleted = task.complete ? false : true;
     API_SERVICES.TASK.UPDATE(task._id, { complete: isCompleted }, setTasks);
-  }
+  };
 
-  function handleUpdateDescription(taskId, newDescription) {
+  const handleUpdateDescription = (taskId, newDescription) => {
     API_SERVICES.TASK.UPDATE(taskId, { description: newDescription }, setTasks);
-  }
+  };
 
-  function handleAddNewTask() {
+  const handleAddNewTask = () => {
     API_SERVICES.TASK.CREATE(
       {
         description: "untitled",
@@ -34,7 +42,11 @@ function Tasks({ taskList }) {
       },
       setTasks
     );
-  }
+  };
+
+  const handleDeleteList = async () => {
+    API_SERVICES.TASK_LIST.SOFT_DELETE(taskList._id);
+  };
 
   return (
     <Box
@@ -44,16 +56,27 @@ function Tasks({ taskList }) {
         mx: "auto",
         px: isMobile ? 2 : 4,
         py: isMobile ? 2 : 4,
+        position: "relative",
       }}
     >
-      {/* Title */}
-      <Typography
-        variant={isMobile ? "h5" : "h4"}
-        fontWeight="bold"
-        sx={{ mb: 3 }}
+      {/* Header: Title + Delete List Button */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
       >
-        {taskList?.name || "Inbox"}
-      </Typography>
+        <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold">
+          {taskList?.name || "Inbox"}
+        </Typography>
+        <Tooltip title="Delete Task List">
+          <IconButton onClick={handleDeleteList}>
+            <Delete color="error" />
+          </IconButton>
+        </Tooltip>
+      </Box>
 
       {/* Task List */}
       <Box>
@@ -74,10 +97,20 @@ function Tasks({ taskList }) {
         )}
       </Box>
 
-      {/* Add Task */}
-      <Fab color="primary" onClick={handleAddNewTask}>
-        <Add />
-      </Fab>
+      {/* Floating Add Task Button */}
+      <Box mt={3}>
+        <Fab
+          color="primary"
+          onClick={handleAddNewTask}
+          aria-label="Add Task"
+          sx={{
+            boxShadow: 2,
+            px: 2,
+          }}
+        >
+          <Add />
+        </Fab>
+      </Box>
     </Box>
   );
 }

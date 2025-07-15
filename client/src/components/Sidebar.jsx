@@ -19,10 +19,10 @@ import {
   Today,
   CalendarMonth,
   CheckCircle,
-  MoreHoriz,
   GroupAdd,
   Help,
   Tag,
+  Delete,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import API_SERVICES from "../services/apiServices";
@@ -116,12 +116,15 @@ function Sidebar({ setSelectedOption, selectedOption, setSelectedList }) {
             <ListItemText primary="Completed" />
           </ListItemButton>
 
-          {/* More */}
-          <ListItemButton>
+          {/* Recycle Bin */}
+          <ListItemButton
+            selected={selectedOption === "recyle-bin"}
+            onClick={() => setSelectedOption("recycle-bin")}
+          >
             <ListItemIcon>
-              <MoreHoriz />
+              <Delete />
             </ListItemIcon>
-            <ListItemText primary="More" />
+            <ListItemText primary="Recycle Bin" />
           </ListItemButton>
         </List>
 

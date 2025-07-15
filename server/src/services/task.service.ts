@@ -18,6 +18,15 @@ interface UpdateTask {
   complete?: boolean;
 }
 
+interface GetTaskFilter {
+  _id?: string;
+  assignedTo?: string;
+  dueDate?: Date;
+  complete?: boolean;
+  taskList?: string;
+  active?: boolean;
+}
+
 export const createTask = async (
   data: CreateTaskInput
 ): Promise<ITask | null> => {
@@ -26,7 +35,7 @@ export const createTask = async (
 };
 
 export const updateTask = async (
-  id: String,
+  id: string,
   data: UpdateTask
 ): Promise<ITask> => {
   const task = await Task.findByIdAndUpdate(id, data, { new: true });
@@ -36,17 +45,20 @@ export const updateTask = async (
   return task;
 };
 
-export const getAllTask = async () => {
-  const tasks = await Task.find({});
+export const getAllTask = async (filter: GetTaskFilter): Promise<ITask[]> => {
+  const tasks = await Task.find(filter);
   return tasks;
 };
 
-export const softDeleteTask = async (id: String) => {
+export const getAllTaskIncludeInactive = async (
+  filter: GetTaskFilter
+): Promise<ITask[]> => {
+  //@ts-ignore
+  const tasks = await Task.find(filter).includeInActive();
+  return tasks;
+};
+
+export const softDeleteTask = async (id: string): Promise<null> => {
   const task = await Task.findByIdAndDelete(id);
   return null;
-};
-
-export const getAllTaskOfTaskList = async (taskListId: String) => {
-  const tasks = await Task.find({ taskList: taskListId });
-  return tasks;
 };

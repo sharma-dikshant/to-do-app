@@ -39,7 +39,16 @@ const taskSchema = new Schema<ITask>(
   { timestamps: true }
 );
 
+//@ts-ignore
+taskSchema.query.includeInActive  = function () {
+  //@ts-ignore
+  this._includeInActive = true;
+  return this;
+}
+
 taskSchema.pre(/^find/, function (next) {
+  //@ts-ignore
+  if (this._includeInActive) return next();
   // @ts-ignore
   this.where({ active: { $ne: false } });
   next();

@@ -28,6 +28,41 @@ const API_SERVICES = {
         toast.error("failed to fetch task lists");
       }
     },
+    RECYCLE_BIN_TASKLISTS: async (setTaskList) => {
+      try {
+        const response = await axios.get(API_ROUTES.TASK_LIST.RECYCLE_BIN, {
+          withCredentials: true,
+        });
+        setTaskList(response.data.data || []);
+      } catch (error) {
+        toast.error("failed to fetch tasklists");
+      }
+    },
+    SOFT_DELETE: async (taskListId, setTaskList) => {
+      try {
+        await axios.delete(API_ROUTES.TASK_LIST.SOFT_DELETE(taskListId), {
+          withCredentials: true,
+        });
+        toast.success("successfully removed");
+        if (setTaskList)
+          setTaskList((p) => p.filter((t) => t._id !== taskListId));
+      } catch (error) {
+        console.log(error);
+        toast.error("failed to remove taskList");
+      }
+    },
+    RESTORE: async (taskListId) => {
+      try {
+        const response = await axios.post(
+          API_ROUTES.TASK_LIST.RESTORE(taskListId),
+          {},
+          { withCredentials: true }
+        );
+        toast.success("list restored");
+      } catch (error) {
+        toast.error("failed to restore tasklist");
+      }
+    },
   },
   TASK: {
     CREATE: async (newtask, setTasks) => {
