@@ -51,7 +51,7 @@ const API_SERVICES = {
         toast.error("failed to remove taskList");
       }
     },
-    RESTORE: async (taskListId) => {
+    RESTORE: async (taskListId, setRecycleTaskLists) => {
       try {
         const response = await axios.post(
           API_ROUTES.TASK_LIST.RESTORE(taskListId),
@@ -59,6 +59,7 @@ const API_SERVICES = {
           { withCredentials: true }
         );
         toast.success("list restored");
+        setRecycleTaskLists((p) => p.filter((t) => t._id !== taskListId));
       } catch (error) {
         toast.error("failed to restore tasklist");
       }

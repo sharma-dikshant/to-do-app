@@ -7,18 +7,26 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import TaskItem from "./TaskItem";
 import { Add, Delete } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import API_SERVICES from "../services/apiServices";
+import TaskItem from "./TaskItem";
+import DeletedTaskListView from "./DeletedTaskListView";
 
-function Tasks({ taskList }) {
+function Tasks({ taskList, taskLists, setTaskLists }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [tasks, setTasks] = useState([]);
+  const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
-    if (taskList) API_SERVICES.TASK.ALL_TASK_OF_LIST(taskList._id, setTasks);
+    setIsDeleted(!taskList);
+  }, [taskList]);
+
+  useEffect(() => {
+    if (taskList?._id) {
+      API_SERVICES.TASK.ALL_TASK_OF_LIST(taskList._id, setTasks);
+    }
   }, [taskList]);
 
   const handleDeleteTask = (taskId) => {
@@ -26,7 +34,7 @@ function Tasks({ taskList }) {
   };
 
   const handleCompleteTask = (task) => {
-    const isCompleted = task.complete ? false : true;
+    const isCompleted = !task.complete;
     API_SERVICES.TASK.UPDATE(task._id, { complete: isCompleted }, setTasks);
   };
 
@@ -45,8 +53,16 @@ function Tasks({ taskList }) {
   };
 
   const handleDeleteList = async () => {
-    API_SERVICES.TASK_LIST.SOFT_DELETE(taskList._id);
+    try {
+      await API_SERVICES.TASK_LIST.SOFT_DELETE(taskList._id, setTaskLists);
+      setIsDeleted(true);
+    } catch (error) {
+      console.error("Failed to delete task list:", error);
+    }
   };
+
+  // Show deleted task list UI
+  if (isDeleted) return <DeletedTaskListView />;
 
   return (
     <Box
@@ -56,10 +72,9 @@ function Tasks({ taskList }) {
         mx: "auto",
         px: isMobile ? 2 : 4,
         py: isMobile ? 2 : 4,
-        position: "relative",
       }}
     >
-      {/* Header: Title + Delete List Button */}
+      {/* Header: Title and Delete Button */}
       <Box
         sx={{
           display: "flex",
@@ -80,7 +95,7 @@ function Tasks({ taskList }) {
 
       {/* Task List */}
       <Box>
-        {tasks?.length ? (
+        {tasks.length > 0 ? (
           tasks.map((task, i) => (
             <TaskItem
               key={i}
@@ -97,16 +112,13 @@ function Tasks({ taskList }) {
         )}
       </Box>
 
-      {/* Floating Add Task Button */}
+      {/* Add Task Button (FAB) */}
       <Box mt={3}>
         <Fab
           color="primary"
           onClick={handleAddNewTask}
           aria-label="Add Task"
-          sx={{
-            boxShadow: 2,
-            px: 2,
-          }}
+          sx={{ boxShadow: 2, px: 2 }}
         >
           <Add />
         </Fab>

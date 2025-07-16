@@ -71,10 +71,10 @@ function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("today");
   const [selectedList, setSelectedList] = useState(null);
+  const [taskLists, setTaskLists] = useState([]);
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -119,6 +119,8 @@ function Home() {
             setSelectedOption={setSelectedOption}
             selectedOption={selectedOption}
             setSelectedList={setSelectedList}
+            taskLists={taskLists}
+            setTaskLists={setTaskLists}
           />
         </Drawer>
       </Box>
@@ -126,8 +128,16 @@ function Home() {
       {/* Main Content */}
       {selectedOption !== "today" &&
         selectedOption !== "calender" &&
-        selectedOption !== "recycle-bin" && <Tasks taskList={selectedList} />}
-      {selectedOption === "recycle-bin" && <TaskListRecycleBIn />}
+        selectedOption !== "recycle-bin" && (
+          <Tasks
+            taskList={selectedList}
+            taskLists={taskLists}
+            setTaskLists={setTaskLists}
+          />
+        )}
+      {selectedOption === "recycle-bin" && (
+        <TaskListRecycleBIn taskLists={taskLists} setTaskLists={setTaskLists} />
+      )}
       {selectedOption === "today" && <div>Yet to implement</div>}
       {selectedOption === "calender" && (
         <TaskCalendar tasks={tasks} isMobile={isMobile} />

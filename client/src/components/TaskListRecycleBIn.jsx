@@ -13,19 +13,19 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import API_SERVICES from "../services/apiServices";
 
-function TaskListRecycleBin() {
-  const [taskLists, setTaskList] = useState([]);
+function TaskListRecycleBin({ taskLists, setTaskLists }) {
+  const [r_taskLists, setR_TaskLists] = useState([]);
 
   useEffect(() => {
-    API_SERVICES.TASK_LIST.RECYCLE_BIN_TASKLISTS(setTaskList);
+    API_SERVICES.TASK_LIST.RECYCLE_BIN_TASKLISTS(setR_TaskLists);
   }, []);
 
-  const handleRestore = (id) => {
-    API_SERVICES.TASK_LIST.RESTORE(id);
+  const handleRestore = (taskList) => {
+    API_SERVICES.TASK_LIST.RESTORE(taskList._id, setR_TaskLists);
+    setTaskLists((p) => [...p, taskList]);
   };
 
   const handlePermanentDelete = (id) => {
-    // API_SERVICES.TASK_LIST.DELETE_FOREVER(id).then(() => fetch again if needed);
     console.log("Delete forever", id);
   };
 
@@ -35,13 +35,13 @@ function TaskListRecycleBin() {
         Recycle Bin
       </Typography>
 
-      {taskLists.length === 0 ? (
+      {r_taskLists.length === 0 ? (
         <Typography variant="body1" color="text.secondary">
           Nothing in recycle bin.
         </Typography>
       ) : (
         <Grid container spacing={3}>
-          {taskLists.map((taskList) => (
+          {r_taskLists.map((taskList) => (
             <Grid item xs={12} sm={6} md={4} key={taskList.id}>
               <Card
                 sx={{
@@ -68,7 +68,7 @@ function TaskListRecycleBin() {
                 <CardActions sx={{ justifyContent: "space-between", px: 2 }}>
                   <IconButton
                     color="success"
-                    onClick={() => handleRestore(taskList._id)}
+                    onClick={() => handleRestore(taskList)}
                   >
                     <RestoreIcon />
                   </IconButton>

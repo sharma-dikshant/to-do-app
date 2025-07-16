@@ -27,8 +27,13 @@ import {
 import { useEffect, useState } from "react";
 import API_SERVICES from "../services/apiServices";
 
-function Sidebar({ setSelectedOption, selectedOption, setSelectedList }) {
-  const [taskLists, setTaskList] = useState([]);
+function Sidebar({
+  setSelectedOption,
+  selectedOption,
+  setSelectedList,
+  taskLists,
+  setTaskLists,
+}) {
   const [openDialog, setOpenDialog] = useState(false);
   const [newListName, setNewListName] = useState("");
 
@@ -36,14 +41,14 @@ function Sidebar({ setSelectedOption, selectedOption, setSelectedList }) {
     //TODO Replace with dynamic user ID if needed
     API_SERVICES.TASK_LIST.ALL_LIST_OF_USER(
       "687211c6b451258d5cc9b045",
-      setTaskList
+      setTaskLists
     );
   }, []);
 
   function handleCreateNewTaskList() {
     if (!newListName.trim()) return;
     const data = { name: newListName };
-    API_SERVICES.TASK_LIST.CREATE(setTaskList, data);
+    API_SERVICES.TASK_LIST.CREATE(setTaskLists, data);
     newListName("");
   }
 
