@@ -58,6 +58,12 @@ export const softDeleteTaskList = async (taskListId: string) => {
   return null;
 };
 
+export const permanentDeleteTaskList = async (TaskListId: string) => {
+  //@ts-ignore
+  await TaskList.findByIdAndDelete(TaskListId).includeInActive();
+  return null;
+}
+
 export const restoreTaskList = async (taskListId: string) => {
   // by-pass find query
   await TaskList.updateOne({ _id: taskListId }, { active: true });

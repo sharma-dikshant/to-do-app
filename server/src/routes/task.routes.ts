@@ -4,19 +4,24 @@ import {
   handleGetAllAssignedTasks,
   handleGetAllTasks,
   handleGetAllTasksOfTaskList,
-  handleSoftDeleteTask,
+  handleDeleteTask,
   handleUpdateBasicDetails,
+  handleGetDueTasks,
+  handleGetMonthTasks,
 } from "../controllers/task.controller";
 import { protect } from "../controllers/auth.controller";
 
 const router = express.Router();
 
 router.use(protect);
-router.get("/all", handleGetAllTasks);
-router.get("/assigned/all", handleGetAllAssignedTasks);
-router.get("/task-lists/:taskListId", handleGetAllTasksOfTaskList);
 router.post("/", handleCreate);
 router.patch("/details/:taskId", handleUpdateBasicDetails);
-router.delete("/:taskId", handleSoftDeleteTask);
+router.delete("/:taskId", handleDeleteTask);
+
+router.get("/all", handleGetAllTasks);
+router.get("/assigned/me", handleGetAllAssignedTasks);
+router.get("/task-lists/:taskListId", handleGetAllTasksOfTaskList);
+router.get("/due", handleGetDueTasks);
+router.get("/year/:year/month/:month", handleGetMonthTasks);
 
 export default router;

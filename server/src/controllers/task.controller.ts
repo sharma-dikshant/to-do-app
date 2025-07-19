@@ -4,8 +4,10 @@ import AppError from "../utils/appError";
 import {
   createTask,
   getAllTask,
-  softDeleteTask,
+  deleteTask,
   updateTask,
+  getDueTasksOnDate,
+  getMonthTasks,
 } from "../services/task.service";
 import { isValidObjectId, Types } from "mongoose";
 import { AuthenticatedRequest } from "../types";
@@ -75,10 +77,10 @@ export const handleGetAllTasksOfTaskList = catchAsync(
   }
 );
 
-export const handleSoftDeleteTask = catchAsync(
+export const handleDeleteTask = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { taskId } = req.params;
-    await softDeleteTask(taskId);
+    await deleteTask(taskId);
 
     return new APIResponse(204, "success", null).send(res);
   }
@@ -87,6 +89,29 @@ export const handleSoftDeleteTask = catchAsync(
 export const handleGetAllAssignedTasks = catchAsync(
   async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const tasks = await getAllTask({ assignedTo: req.user._id });
+    return new APIResponse(200, "success", tasks).send(res);
+  }
+);
+
+export const handleGetDueTasks = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    let date = new Date();
+
+    if (req.query.date) {
+      date = new Date(req.query.date as string);
+    }
+
+    const tasks = await getDueTasksOnDate(date.toISOString());
+
+    return new APIResponse(200, "success", tasks).send(res);
+  }
+);
+
+export const handleGetMonthTasks = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { month, year } = req.params;
+
+    const tasks = await getMonthTasks(Number(month), Number(year));
     return new APIResponse(200, "success", tasks).send(res);
   }
 );

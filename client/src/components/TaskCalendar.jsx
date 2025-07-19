@@ -3,6 +3,8 @@ import { format, parse, startOfWeek, getDay, isSameMonth } from "date-fns";
 import enUS from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Box, useTheme, useMediaQuery } from "@mui/material";
+import { useEffect, useState } from "react";
+import API_SERVICES from "../services/apiServices";
 
 const locales = {
   "en-US": enUS,
@@ -16,17 +18,27 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-function TaskCalendar({ tasks }) {
+function TaskCalendar() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const now = new Date();
+  const [now, setNow] = useState(new Date());
+
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    API_SERVICES.TASK.ALL_TASK_OF_MONTH_YEAR(
+      now.getMonth(),
+      now.getFullYear(),
+      setTasks
+    );
+  }, [now]);
 
   const events = tasks
-    .filter((task) => {
+    ?.filter((task) => {
       if (task.completed || !task.dueDate) return false;
       return isSameMonth(new Date(task.dueDate), now);
     })
-    .map((task) => ({
+    ?.map((task) => ({
       title: task.description,
       start: new Date(task.dueDate),
       end: new Date(task.dueDate),

@@ -113,12 +113,15 @@ function Sidebar({
             <ListItemText primary="Upcoming" />
           </ListItemButton>
 
-          {/* Completed */}
-          <ListItemButton>
+          {/* Assigned */}
+          <ListItemButton
+            selected={selectedOption === "assigned"}
+            onClick={() => setSelectedOption("assigned")}
+          >
             <ListItemIcon>
               <CheckCircle />
             </ListItemIcon>
-            <ListItemText primary="Completed" />
+            <ListItemText primary="Assigned" />
           </ListItemButton>
 
           {/* Recycle Bin */}

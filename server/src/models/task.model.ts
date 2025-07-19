@@ -9,6 +9,8 @@ export interface ITask extends Document {
   complete: boolean;
 }
 
+//TODO user id is also required in tasks because we need to filter tasks based on user
+
 const taskSchema = new Schema<ITask>(
   {
     description: {
@@ -40,11 +42,11 @@ const taskSchema = new Schema<ITask>(
 );
 
 //@ts-ignore
-taskSchema.query.includeInActive  = function () {
+taskSchema.query.includeInActive = function () {
   //@ts-ignore
   this._includeInActive = true;
   return this;
-}
+};
 
 taskSchema.pre(/^find/, function (next) {
   //@ts-ignore

@@ -1,33 +1,23 @@
-import {
-  Box,
-  Typography,
-  useTheme,
-  useMediaQuery,
-  Fab,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
-import { Add, Delete } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import API_SERVICES from "../services/apiServices";
+import Tasks from "./Tasks";
+import {
+  Box,
+  IconButton,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import TaskItem from "./TaskItem";
-import DeletedTaskListView from "./DeletedTaskListView";
 
-function Tasks({ taskList, setTaskLists }) {
+function TodayDueTaskList() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [tasks, setTasks] = useState([]);
-  const [isDeleted, setIsDeleted] = useState(false);
-
   useEffect(() => {
-    setIsDeleted(!taskList);
-  }, [taskList]);
-
-  useEffect(() => {
-    if (taskList?._id) {
-      API_SERVICES.TASK.ALL_TASK_OF_LIST(taskList._id, setTasks);
-    }
-  }, [taskList]);
+    API_SERVICES.TASK.ALL_TASK_DUE_ON_DATE(setTasks);
+  }, []);
 
   const handleDeleteTask = (taskId) => {
     API_SERVICES.TASK.DELETE(taskId, setTasks);
@@ -42,35 +32,9 @@ function Tasks({ taskList, setTaskLists }) {
     API_SERVICES.TASK.UPDATE(taskId, { description: newDescription }, setTasks);
   };
 
-  const handleAssignDueDate = (taskId, dueDate) => {
-    API_SERVICES.TASK.UPDATE(taskId, { dueDate }, setTasks);
-  };
-
   const handleAssignTask = (taskId, userId) => {
     API_SERVICES.TASK.UPDATE(taskId, { assignedTo: userId }, setTasks);
   };
-
-  const handleAddNewTask = () => {
-    API_SERVICES.TASK.CREATE(
-      {
-        description: "untitled",
-        taskList: taskList._id,
-      },
-      setTasks
-    );
-  };
-
-  const handleDeleteList = async () => {
-    try {
-      await API_SERVICES.TASK_LIST.SOFT_DELETE(taskList._id, setTaskLists);
-      setIsDeleted(true);
-    } catch (error) {
-      console.error("Failed to delete task list:", error);
-    }
-  };
-
-  // Show deleted task list UI
-  if (isDeleted) return <DeletedTaskListView />;
 
   return (
     <Box
@@ -92,13 +56,8 @@ function Tasks({ taskList, setTaskLists }) {
         }}
       >
         <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold">
-          {taskList?.name || "Inbox"}
+          {"Due Today"}
         </Typography>
-        <Tooltip title="Delete Task List">
-          <IconButton onClick={handleDeleteList}>
-            <Delete color="error" />
-          </IconButton>
-        </Tooltip>
       </Box>
 
       {/* Task List */}
@@ -112,7 +71,6 @@ function Tasks({ taskList, setTaskLists }) {
               handleCompleteTask={handleCompleteTask}
               handleUpdateDescription={handleUpdateDescription}
               handleAssignTask={handleAssignTask}
-              handleAssignDueDate={handleAssignDueDate}
             />
           ))
         ) : (
@@ -121,20 +79,8 @@ function Tasks({ taskList, setTaskLists }) {
           </Typography>
         )}
       </Box>
-
-      {/* Add Task Button (FAB) */}
-      <Box mt={3}>
-        <Fab
-          color="primary"
-          onClick={handleAddNewTask}
-          aria-label="Add Task"
-          sx={{ boxShadow: 2, px: 2 }}
-        >
-          <Add />
-        </Fab>
-      </Box>
     </Box>
   );
 }
 
-export default Tasks;
+export default TodayDueTaskList;

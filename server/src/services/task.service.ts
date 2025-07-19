@@ -46,7 +46,7 @@ export const updateTask = async (
 };
 
 export const getAllTask = async (filter: GetTaskFilter): Promise<ITask[]> => {
-  const tasks = await Task.find(filter);
+  const tasks = await Task.find(filter).populate("assignedTo", "name email");
   return tasks;
 };
 
@@ -58,7 +58,46 @@ export const getAllTaskIncludeInactive = async (
   return tasks;
 };
 
-export const softDeleteTask = async (id: string): Promise<null> => {
+export const deleteTask = async (id: string): Promise<null> => {
   const task = await Task.findByIdAndDelete(id);
   return null;
+};
+
+export const getDueTasksOnDate = async (date: string): Promise<ITask[]> => {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(date);
+  end.setHours(23, 59, 59, 999);
+
+  const tasks = await Task.find({
+    dueDate: {
+      $gte: start,
+      $lte: end,
+    },
+  });
+
+  return tasks;
+};
+
+export const getMonthTasks = async (
+  month: number,
+  year: number
+): Promise<ITask[]> => {
+  const start = new Date(`${year}-${month + 1}-01`);
+  let end = new Date(`${year}-${month + 2}-01`);
+  if (month == 11) {
+    end = new Date(`${year}-0${1}-${year + 1}`);
+  }
+
+  start.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
+  const tasks = await Task.find({
+    createdAt: {
+      $gte: start,
+      $lt: end,
+    },
+  });
+
+  return tasks;
 };

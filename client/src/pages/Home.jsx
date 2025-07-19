@@ -15,6 +15,8 @@ import Sidebar from "../components/Sidebar";
 import Tasks from "../components/Tasks";
 import TaskCalendar from "../components/TaskCalendar";
 import TaskListRecycleBIn from "../components/TaskListRecycleBIn";
+import AssignedToMeTasks from "../components/AssignedToMeTasks";
+import TodayDueTaskList from "../components/TodayDueTaskList";
 
 const tasks = [
   {
@@ -128,7 +130,8 @@ function Home() {
       {/* Main Content */}
       {selectedOption !== "today" &&
         selectedOption !== "calender" &&
-        selectedOption !== "recycle-bin" && (
+        selectedOption !== "recycle-bin" &&
+        selectedOption !== "assigned" && (
           <Tasks
             taskList={selectedList}
             taskLists={taskLists}
@@ -138,7 +141,8 @@ function Home() {
       {selectedOption === "recycle-bin" && (
         <TaskListRecycleBIn taskLists={taskLists} setTaskLists={setTaskLists} />
       )}
-      {selectedOption === "today" && <div>Yet to implement</div>}
+      {selectedOption === "assigned" && <AssignedToMeTasks />}
+      {selectedOption === "today" && <TodayDueTaskList />}
       {selectedOption === "calender" && (
         <TaskCalendar tasks={tasks} isMobile={isMobile} />
       )}

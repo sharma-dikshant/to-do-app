@@ -3,6 +3,18 @@ import { API_ROUTES } from "./api";
 import toast from "react-hot-toast";
 
 const API_SERVICES = {
+  USER: {
+    SEARCH: async (q, setUsers) => {
+      try {
+        const response = await axios.get(API_ROUTES.USER.SEARCH(q), {
+          withCredentials: true,
+        });
+        setUsers(response.data.data || []);
+      } catch (error) {
+        toast.error("failed to find user!");
+      }
+    },
+  },
   TASK_LIST: {
     CREATE: async (setTaskList, newTaskList) => {
       try {
@@ -114,6 +126,40 @@ const API_SERVICES = {
         setTasks(response.data.data);
       } catch (error) {
         toast.error("failed to fetch tasks");
+      }
+    },
+    ALL_TASK_ASSIGNED_TO_ME: async (settasks) => {
+      try {
+        const response = await axios.get(API_ROUTES.TASK.ALL_TASK_ASSIGNED_ME, {
+          withCredentials: true,
+        });
+
+        settasks(response.data.data || []);
+      } catch (error) {
+        toast.error("failed to fetch assigned tasks");
+      }
+    },
+    ALL_TASK_DUE_ON_DATE: async (setTasks, date = "") => {
+      try {
+        const response = await axios.get(
+          `${API_ROUTES.TASK.DUE_ON_DATE}?date=${date}`,
+          { withCredentials: true }
+        );
+
+        setTasks(response.data.data || []);
+      } catch (error) {
+        toast.error("failed to fetch tasks");
+      }
+    },
+    ALL_TASK_OF_MONTH_YEAR: async (month, year, setTasks) => {
+      try {
+        const response = await axios.get(
+          API_ROUTES.TASK.GET_MONTHS_TASKS(year, month),
+          { withCredentials: true }
+        );
+        setTasks(response.data.data || []);
+      } catch (error) {
+        toast.error("failed to fetch month plan");
       }
     },
   },

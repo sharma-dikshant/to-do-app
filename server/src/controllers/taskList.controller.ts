@@ -6,6 +6,7 @@ import {
   getAllTaskListOfUser,
   getInActiveTaskList,
   getTaskList,
+  permanentDeleteTaskList,
   restoreTaskList,
   softDeleteTaskList,
   updateTaskList,
@@ -47,7 +48,7 @@ export const handleSoftDeleteTaskList = catchAsync(
     const taskList = await getTaskList(taskListId);
 
     if (!taskList) {
-      return next(new AppError("now list found with given id", 400));
+      return next(new AppError("no list found with given id", 400));
     }
     if (taskList.user.toString() !== req.user._id) {
       return next(new AppError("you can only delete your lists", 403));
@@ -64,6 +65,31 @@ export const handleSoftDeleteTaskList = catchAsync(
 
     await softDeleteTaskList(taskListId);
     return new APIResponse(204, "success", null).send(res);
+  }
+);
+
+export const handlePermanentDelete = catchAsync(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const { taskListId } = req.params;
+
+    const taskList = await getInActiveTaskList(taskListId);
+    if (!taskList) {
+      return next(new AppError("no list found with given id", 404));
+    }
+
+    if (taskList.user._id.toString() !== req.user._id) {
+      return next(new AppError("you can only restore your lists", 403));
+    }
+
+    // restore all tasks of this list
+    const tasks = await getAllTaskIncludeInactive({ taskList: taskListId });
+    for (let task of tasks) {
+      await task.deleteOne();
+    }
+
+    await permanentDeleteTaskList(taskListId);
+
+    return new APIResponse(204, "success", null);
   }
 );
 
