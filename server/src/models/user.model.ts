@@ -1,9 +1,10 @@
 import { Document, Schema, model } from "mongoose";
-
+import bcrypt from "bcrypt";
 export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  passwordConfirm?: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -18,8 +19,32 @@ const userSchema = new Schema<IUser>({
   },
   password: {
     type: String,
+    minlength: [8, "password length should be atleast 8"],
     required: [true, "password is required"],
+    select: false,
+  },
+  passwordConfirm: {
+    type: String,
+    required: [true, "password confirm is required"],
+    validate: {
+      validator: function (this) {
+        return this.password === this.passwordConfirm;
+      },
+      message: "password and password confirm is not same",
+    },
   },
 });
+
+userSchema.pre("save", async function (next) {
+  // const hashedPassward = await
+  const hashedPassword = await bcrypt.hash(this.password, 12);
+  this.password = hashedPassword;
+  this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.methods.verifyPassword = async function (candidatePassword: string) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 export const User = model<IUser>("User", userSchema);
