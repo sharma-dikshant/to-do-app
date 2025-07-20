@@ -13,7 +13,9 @@ export const createUser = async (data: CreateUserInput): Promise<IUser> => {
 };
 
 export const getUser = async (email: string): Promise<IUser | null> => {
-  const user = await User.findOne({ email: email }).select("password");
+  const user = await User.findOne({ email: email }).select(
+    "password name email"
+  );
   return user;
 };
 

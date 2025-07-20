@@ -6,5 +6,6 @@ export interface AuthenticatedRequest extends Request {
     //TODO update to ObjectId
     _id: string;
     email?: string;
+    name?: string;
   };
 }

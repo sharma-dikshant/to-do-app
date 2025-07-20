@@ -23,9 +23,11 @@ import {
   Help,
   Tag,
   Delete,
+  Logout,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import API_SERVICES from "../services/apiServices";
+import { useRouteLoaderData } from "react-router-dom";
 
 function Sidebar({
   setSelectedOption,
@@ -33,16 +35,13 @@ function Sidebar({
   setSelectedList,
   taskLists,
   setTaskLists,
+  user,
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [newListName, setNewListName] = useState("");
 
   useEffect(() => {
-    //TODO Replace with dynamic user ID if needed
-    API_SERVICES.TASK_LIST.ALL_LIST_OF_USER(
-      "687211c6b451258d5cc9b045",
-      setTaskLists
-    );
+    API_SERVICES.TASK_LIST.ALL_LIST_OF_USER(user._id, setTaskLists);
   }, []);
 
   function handleCreateNewTaskList() {
@@ -54,9 +53,17 @@ function Sidebar({
 
   return (
     <>
-      <Box sx={{ p: 2 }}>
+      <Box
+        sx={{
+          p: 2,
+          backgroundColor: "#f0e9e056",
+          height: "100%",
+          color: "#752703ff",
+          fontWeight: "800",
+        }}
+      >
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-          Dikshant
+          {user.name?.split(" ")[0] || "Welcome"}
         </Typography>
 
         <List>
@@ -87,7 +94,7 @@ function Sidebar({
               <ListItemIcon>
                 <Inbox />
               </ListItemIcon>
-              <ListItemText primary={taskList.name} secondary="2" />
+              <ListItemText primary={taskList.name} />
             </ListItemButton>
           ))}
 
@@ -136,7 +143,7 @@ function Sidebar({
           </ListItemButton>
         </List>
 
-        <Divider sx={{ my: 2 }} />
+        {/* <Divider sx={{ my: 2 }} />
         <Typography variant="subtitle2" sx={{ ml: 2, mb: 1 }}>
           My Projects
         </Typography>
@@ -147,21 +154,21 @@ function Sidebar({
             </ListItemIcon>
             <ListItemText primary="Getting Started 👋" secondary="13" />
           </ListItemButton>
-        </List>
+        </List> */}
 
         <Divider sx={{ my: 2 }} />
         <List>
-          <ListItemButton>
+          {/* <ListItemButton>
             <ListItemIcon>
               <GroupAdd />
             </ListItemIcon>
             <ListItemText primary="Add a team" />
-          </ListItemButton>
-          <ListItemButton>
+          </ListItemButton> */}
+          <ListItemButton onClick={API_SERVICES.AUTH.LOGOUT}>
             <ListItemIcon>
-              <Help />
+              <Logout />
             </ListItemIcon>
-            <ListItemText primary="Help & resources" />
+            <ListItemText primary="Logout" />
           </ListItemButton>
         </List>
       </Box>

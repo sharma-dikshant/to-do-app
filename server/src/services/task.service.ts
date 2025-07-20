@@ -4,6 +4,7 @@ import AppError from "../utils/appError";
 
 interface CreateTaskInput {
   description: string;
+  user: Types.ObjectId;
   taskList: Types.ObjectId;
   assignedTo?: Types.ObjectId;
   dueDate?: Date;
@@ -80,6 +81,7 @@ export const getDueTasksOnDate = async (date: string): Promise<ITask[]> => {
 };
 
 export const getMonthTasks = async (
+  user: string,
   month: number,
   year: number
 ): Promise<ITask[]> => {
@@ -93,6 +95,8 @@ export const getMonthTasks = async (
   end.setHours(0, 0, 0, 0);
 
   const tasks = await Task.find({
+    //@ts-ignore
+    $or: [{ user: user }, { assignedTo: user }],
     createdAt: {
       $gte: start,
       $lt: end,

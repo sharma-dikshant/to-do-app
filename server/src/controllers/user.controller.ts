@@ -3,11 +3,21 @@ import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 import { createUser, searchUserWithEmail } from "../services/user.service";
 import APIResponse from "../utils/apiResponse";
+import { AuthenticatedRequest } from "../types";
 
 export const handleCreateUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = await createUser(req.body);
     return new APIResponse(200, "success", user).send(res);
+  }
+);
+
+export const handleGetLoggedInUser = catchAsync(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return new APIResponse(400, "no user logged in", null).send(res);
+    }
+    return new APIResponse(200, "success", req.user).send(res);
   }
 );
 

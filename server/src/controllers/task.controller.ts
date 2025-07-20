@@ -108,10 +108,14 @@ export const handleGetDueTasks = catchAsync(
 );
 
 export const handleGetMonthTasks = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const { month, year } = req.params;
 
-    const tasks = await getMonthTasks(Number(month), Number(year));
+    const tasks = await getMonthTasks(
+      req.user._id,
+      Number(month),
+      Number(year)
+    );
     return new APIResponse(200, "success", tasks).send(res);
   }
 );

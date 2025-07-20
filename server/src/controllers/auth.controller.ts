@@ -8,7 +8,11 @@ import { createUser, getUser } from "../services/user.service";
 import APIResponse from "../utils/apiResponse";
 import jwt, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 
-const createToken = (data: { userId: string; email: string }): string => {
+const createToken = (data: {
+  _id: string;
+  name: string;
+  email: string;
+}): string => {
   const secret_key = process.env.JWT_SECRET_KEY;
   const exprires_in = process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"];
 
@@ -27,7 +31,8 @@ const setTokenToCookies = (token: string, res: Response) => {
   res.cookie("authToken", token, {
     secure: true,
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "none",
+    maxAge: 20 * 24 * 60 * 60 * 1000,
   });
 };
 
@@ -35,12 +40,13 @@ export const handleSignup = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = await createUser(req.body);
     const tokenData = {
-      userId: user._id as string,
+      _id: user._id as string,
       email: user.email as string,
+      name: user.name as string,
     };
     const token = createToken(tokenData);
     setTokenToCookies(token, res);
-    return new APIResponse(200, "success", token).send(res);
+    return new APIResponse(200, "success", tokenData).send(res);
   }
 );
 
@@ -63,14 +69,15 @@ export const handleLogin = catchAsync(
     }
 
     const tokenData = {
-      userId: user._id as string,
+      _id: user._id as string,
       email: user.email as string,
+      name: user.name as string,
     };
 
     const token = createToken(tokenData);
     setTokenToCookies(token, res);
 
-    return new APIResponse(200, "success", token).send(res);
+    return new APIResponse(200, "success", tokenData).send(res);
   }
 );
 
@@ -109,11 +116,16 @@ export const protect = catchAsync(
       const decoded = jwt.verify(token, secret_key) as {
         _id: string;
         email?: string;
+        name?: string;
       };
 
       //TODO also verify the user in the token
       if (decoded) {
-        req.user = decoded;
+        req.user = {
+          _id: decoded._id,
+          email: decoded.email,
+          name: decoded.name,
+        };
       } else {
         return next(new AppError("please login again to continue", 403));
       }

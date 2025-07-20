@@ -2,11 +2,16 @@ import { redirect } from "react-router-dom";
 import axios from "axios";
 
 import { API_ROUTES } from "./api";
+
 export async function loadUser() {
   try {
-    throw Error("error");
+    const response = await axios.get(API_ROUTES.USER.GET_LOGGED_IN_USER, {
+      withCredentials: true,
+    });
+    return response.data.data;
   } catch (error) {
-    throw redirect("/home");
+    console.log(error);
+    throw redirect("/auth");
   }
 }
 

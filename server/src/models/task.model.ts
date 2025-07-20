@@ -2,6 +2,7 @@ import mongoose, { Document, Schema, model, Types } from "mongoose";
 
 export interface ITask extends Document {
   description: string;
+  user: Types.ObjectId;
   taskList: Types.ObjectId;
   assignedTo?: Types.ObjectId;
   dueDate?: Date;
@@ -9,13 +10,16 @@ export interface ITask extends Document {
   complete: boolean;
 }
 
-//TODO user id is also required in tasks because we need to filter tasks based on user
-
 const taskSchema = new Schema<ITask>(
   {
     description: {
       type: String,
       required: [true, "task description is required"],
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "task must belong to a user"],
     },
     taskList: {
       type: Schema.Types.ObjectId,

@@ -6,6 +6,7 @@ import { Box, useTheme, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import API_SERVICES from "../services/apiServices";
 
+//TODO prev month, next month is not workins still
 const locales = {
   "en-US": enUS,
 };
@@ -63,6 +64,8 @@ function TaskCalendar() {
         endAccessor="end"
         defaultView="month"
         views={["month"]}
+        date={now}
+        onNavigate={(newDate) => setNow(newDate)}
         style={{
           height: "100%",
           borderRadius: "10px",

@@ -17,6 +17,7 @@ import TaskCalendar from "../components/TaskCalendar";
 import TaskListRecycleBIn from "../components/TaskListRecycleBIn";
 import AssignedToMeTasks from "../components/AssignedToMeTasks";
 import TodayDueTaskList from "../components/TodayDueTaskList";
+import { useLoaderData, useRouteLoaderData } from "react-router-dom";
 
 const tasks = [
   {
@@ -68,12 +69,14 @@ const tasks = [
 const drawerWidth = 280;
 
 function Home() {
+  const user = useRouteLoaderData("root");
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("today");
   const [selectedList, setSelectedList] = useState(null);
   const [taskLists, setTaskLists] = useState([]);
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -123,6 +126,7 @@ function Home() {
             setSelectedList={setSelectedList}
             taskLists={taskLists}
             setTaskLists={setTaskLists}
+            user={user}
           />
         </Drawer>
       </Box>

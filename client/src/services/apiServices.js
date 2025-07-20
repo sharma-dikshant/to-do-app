@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_ROUTES } from "./api";
 import toast from "react-hot-toast";
+import { redirect } from "react-router-dom";
 
 const API_SERVICES = {
   USER: {
@@ -161,6 +162,17 @@ const API_SERVICES = {
       } catch (error) {
         toast.error("failed to fetch month plan");
       }
+    },
+  },
+  AUTH: {
+    LOGOUT: async () => {
+      try {
+        await axios.post(API_ROUTES.AUTH.LOGOUT, {}, { withCredentials: true });
+        toast.success("logged out");
+      } catch (error) {
+        toast.error("failed to logout");
+      }
+      window.location.href = "/auth";
     },
   },
 };
