@@ -29,7 +29,6 @@ function AssignedToMeTasks({ currentUserName }) {
     API_SERVICES.TASK.UPDATE(task._id, { complete: isCompleted }, setTasks);
   };
 
-  // Fetch tasks on mount
   useEffect(() => {
     const fetchTasks = async () => {
       setLoading(true);
@@ -66,14 +65,12 @@ function AssignedToMeTasks({ currentUserName }) {
   return (
     <Box
       sx={{
-        width: "100%",
-        maxWidth: "800px",
+        width: "80%",
         mx: "auto",
         px: isMobile ? 2 : 4,
         py: isMobile ? 2 : 4,
       }}
     >
-      {/* Header */}
       <Box
         sx={{
           display: "flex",
@@ -88,24 +85,44 @@ function AssignedToMeTasks({ currentUserName }) {
       </Box>
 
       {/* Task List */}
-      <Box>
-        {tasks.map((task, i) => {
-          const isOverdue = task.dueDate && task.dueDate < Date.now();
+      {tasks.map((task, i) => {
+        const isOverdue = task.dueDate && new Date(task.dueDate) < Date.now();
 
-          return (
+        return (
+          <Box
+            key={i}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.opacity = task.complete ? 0.5 : 1)
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.opacity = task.complete ? 0.5 : 1)
+            }
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              py: 3,
+              px: 1,
+              borderBottom: "1px solid #eee",
+              opacity: task.complete ? 0.5 : 1,
+            }}
+          >
+            {/* Task Row */}
             <Box
-              key={i}
               sx={{
                 display: "flex",
-                flexDirection: "column",
-                py: 1.5,
-                px: 1,
-                borderBottom: "1px solid #eee",
-                opacity: task.complete ? 0.5 : 1,
+                alignItems: "flex-start",
+                justifyContent: "space-between",
               }}
             >
-              {/* Task Title */}
-              <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 1.2,
+                  width: "100%",
+                }}
+              >
+                {/* Completion circle */}
                 <button
                   style={{
                     border: "none",
@@ -125,49 +142,67 @@ function AssignedToMeTasks({ currentUserName }) {
                   />
                 </button>
 
-                <Typography fontSize="1rem" fontWeight={500}>
-                  {task.description}
-                </Typography>
-              </Box>
+                {/* Description & Tags */}
+                <Box sx={{ width: "100%" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: "1.1rem",
+                      wordBreak: "break-word",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {task.description}
+                  </Typography>
 
-              {/* Task Tags */}
-              <Box sx={{ display: "flex", gap: 1, mt: 0.5, flexWrap: "wrap" }}>
-                {task.dueDate && (
-                  <Chip
-                    size="small"
-                    icon={<Event fontSize="small" />}
-                    label={formatDueDate(task.dueDate)}
+                  {/* Tags */}
+                  <Box
                     sx={{
-                      bgcolor: isOverdue ? "#ffe5e5" : "#f0f0f0",
-                      color: isOverdue ? "error.main" : "text.primary",
-                      borderRadius: 1,
+                      display: "flex",
+                      gap: 1,
+                      mt: 0.5,
+                      flexWrap: "wrap",
+                      width: "100%",
                     }}
-                  />
-                )}
-                {task.assignedTo && (
-                  <Chip
-                    size="small"
-                    label={task.assignedTo.name}
-                    sx={{
-                      bgcolor: "#e3f2fd",
-                      color: "#1976d2",
-                      borderRadius: 1,
-                    }}
-                  />
-                )}
-                {task.complete && (
-                  <Chip
-                    size="small"
-                    label="Completed"
-                    color="success"
-                    sx={{ borderRadius: 1 }}
-                  />
-                )}
+                  >
+                    {task.dueDate && (
+                      <Chip
+                        size="small"
+                        icon={<Event fontSize="small" />}
+                        label={formatDueDate(task.dueDate)}
+                        sx={{
+                          bgcolor: isOverdue ? "#ffe5e5" : "#f0f0f0",
+                          color: isOverdue ? "error.main" : "text.primary",
+                          borderRadius: 1,
+                        }}
+                      />
+                    )}
+                    {task.assignedTo && (
+                      <Chip
+                        size="small"
+                        label={task.assignedTo.name}
+                        sx={{
+                          bgcolor: "#e3f2fd",
+                          color: "#1976d2",
+                          borderRadius: 1,
+                        }}
+                      />
+                    )}
+                    {task.complete && (
+                      <Chip
+                        size="small"
+                        label="Completed"
+                        color="success"
+                        sx={{ borderRadius: 1 }}
+                      />
+                    )}
+                  </Box>
+                </Box>
               </Box>
             </Box>
-          );
-        })}
-      </Box>
+          </Box>
+        );
+      })}
     </Box>
   );
 }

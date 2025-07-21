@@ -3,7 +3,8 @@ const BASE_URL = "http://127.0.0.1:3000";
 export const API_ROUTES = {
     USER: {
         CREATE: `${BASE_URL}/api/users`,
-        SEARCH: (q) => `${BASE_URL}/api/users/search?q=${q}`,
+        SEARCH_BY_EMAIL: (q) => `${BASE_URL}/api/users/search/email?q=${q}`,
+        SEARCH_BY_NAME: (q) => `${BASE_URL}/api/users/search/name?q=${q}`,
         GET_LOGGED_IN_USER: `${BASE_URL}/api/users/logged-in`
     },
     TASK_LIST: {

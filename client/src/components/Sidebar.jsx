@@ -56,6 +56,7 @@ function Sidebar({
       <Box
         sx={{
           p: 2,
+          // width: '80%',
           backgroundColor: "#f0e9e056",
           height: "100%",
           color: "#752703ff",
@@ -106,7 +107,7 @@ function Sidebar({
             <ListItemIcon>
               <Today />
             </ListItemIcon>
-            <ListItemText primary="Today" secondary="2" />
+            <ListItemText primary="Today" />
           </ListItemButton>
 
           {/* Upcoming */}

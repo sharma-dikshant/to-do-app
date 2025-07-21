@@ -5,9 +5,19 @@ import { redirect } from "react-router-dom";
 
 const API_SERVICES = {
   USER: {
-    SEARCH: async (q, setUsers) => {
+    SEARCH_BY_EMAIL: async (q, setUsers) => {
       try {
-        const response = await axios.get(API_ROUTES.USER.SEARCH(q), {
+        const response = await axios.get(API_ROUTES.USER.SEARCH_BY_EMAIL(q), {
+          withCredentials: true,
+        });
+        setUsers(response.data.data || []);
+      } catch (error) {
+        toast.error("failed to find user!");
+      }
+    },
+    SEARCH_BY_NAME: async (q, setUsers) => {
+      try {
+        const response = await axios.get(API_ROUTES.USER.SEARCH_BY_NAME(q), {
           withCredentials: true,
         });
         setUsers(response.data.data || []);

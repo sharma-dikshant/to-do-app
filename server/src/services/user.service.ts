@@ -25,3 +25,11 @@ export const searchUserWithEmail = async (data: string): Promise<IUser[]> => {
   });
   return users;
 };
+
+export const searchUserWithName = async (data: string): Promise<IUser[]> => {
+  const users = await User.find({
+    name: { $regex: "^" + data, $options: "i" },
+  });
+
+  return users;
+};

@@ -75,8 +75,8 @@ function Tasks({ taskList, setTaskLists }) {
   return (
     <Box
       sx={{
-        width: "100%",
-        maxWidth: "800px",
+        width: "80%",
+        // maxWidth: "900px",
         mx: "auto",
         px: isMobile ? 2 : 4,
         py: isMobile ? 2 : 4,

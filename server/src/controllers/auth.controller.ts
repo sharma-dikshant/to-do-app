@@ -28,6 +28,7 @@ const createToken = (data: {
 };
 
 const setTokenToCookies = (token: string, res: Response) => {
+  //TODO set secure to true on production
   res.cookie("authToken", token, {
     secure: true,
     httpOnly: true,
@@ -46,7 +47,9 @@ export const handleSignup = catchAsync(
     };
     const token = createToken(tokenData);
     setTokenToCookies(token, res);
-    return new APIResponse(200, "success", tokenData).send(res);
+    return new APIResponse(200, "success", { user: tokenData, token }).send(
+      res
+    );
   }
 );
 
@@ -77,7 +80,9 @@ export const handleLogin = catchAsync(
     const token = createToken(tokenData);
     setTokenToCookies(token, res);
 
-    return new APIResponse(200, "success", tokenData).send(res);
+    return new APIResponse(200, "success", { user: tokenData, token }).send(
+      res
+    );
   }
 );
 

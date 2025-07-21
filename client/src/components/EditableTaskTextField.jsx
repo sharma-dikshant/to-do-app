@@ -1,42 +1,45 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { TextField, Typography } from "@mui/material";
 
-function EditableTaskTextField({ task, handleUpdateDescription }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [desc, setDesc] = useState(task.description);
-  const inputRef = useRef(null);
+function EditableTaskTextField({ task, handleUpdateDescription, inputRef }) {
+  const [value, setValue] = useState(task.description);
+  const [editing, setEditing] = useState(false);
 
+  // Autofocus when editing starts
   useEffect(() => {
-    if (isEditing && inputRef.current) {
+    if (editing && inputRef?.current) {
       inputRef.current.focus();
     }
-  }, [isEditing]);
+  }, [editing, inputRef]);
 
   const handleBlur = () => {
-    setIsEditing(false);
-    if (desc !== task.description) {
-      handleUpdateDescription(task._id, desc); // Call your update function
+    if (value.trim() && value !== task.description) {
+      handleUpdateDescription(task._id, value.trim());
     }
+    setEditing(false);
   };
 
-  return isEditing ? (
+  return editing ? (
     <TextField
       inputRef={inputRef}
-      value={desc}
-      onChange={(e) => setDesc(e.target.value)}
-      onBlur={handleBlur}
-      variant="standard"
+      variant="outlined"
+      size="small"
       fullWidth
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={handleBlur}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") e.target.blur();
+      }}
+      sx={{
+        input: { fontSize: "1rem", padding: "6px" },
+      }}
     />
   ) : (
     <Typography
       variant="body1"
-      sx={{
-        textDecoration: task.complete ? "line-through" : "none",
-        fontWeight: 500,
-        cursor: "pointer",
-      }}
-      onClick={() => setIsEditing(true)}
+      sx={{ wordBreak: "break-word", fontSize: "1.3rem", cursor: "pointer" }}
+      onClick={() => setEditing(true)}
     >
       {task.description}
     </Typography>

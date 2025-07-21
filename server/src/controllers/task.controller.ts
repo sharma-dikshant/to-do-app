@@ -94,14 +94,14 @@ export const handleGetAllAssignedTasks = catchAsync(
 );
 
 export const handleGetDueTasks = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     let date = new Date();
 
     if (req.query.date) {
       date = new Date(req.query.date as string);
     }
 
-    const tasks = await getDueTasksOnDate(date.toISOString());
+    const tasks = await getDueTasksOnDate(req.user._id, date.toISOString());
 
     return new APIResponse(200, "success", tasks).send(res);
   }

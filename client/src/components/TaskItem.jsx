@@ -1,8 +1,9 @@
 import { Box, Typography, IconButton, Tooltip, Chip } from "@mui/material";
 import { Delete, PersonAddAlt, Event } from "@mui/icons-material";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EditableTaskTextField from "./EditableTaskTextField";
 import SearchUserByEmailInput from "./SearchUserByEmailInput";
+import SearchUserByName from "./SearchUserByName";
 
 function formatDueDate(timestamp) {
   const date = new Date(timestamp);
@@ -21,11 +22,21 @@ function TaskItem({
   handleAssignDueDate,
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  const isOverdue = task.dueDate && task.dueDate < Date.now();
   const [openDateInput, setOpenDateInput] = useState(false);
   const [dueDate, setDueDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+  const inputRef = useRef();
+
+  useEffect(() => {
+    // Auto-focus on new task
+    if (task.description === "untitled" && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [task]);
+
+  const isOverdue = task.dueDate && new Date(task.dueDate) < Date.now();
+
   return (
     <Box
       onMouseEnter={() => setIsHovered(true)}
@@ -39,7 +50,7 @@ function TaskItem({
         opacity: task.complete ? 0.5 : 1,
       }}
     >
-      {/* Top: Main Task Row */}
+      {/* Top Row */}
       <Box
         sx={{
           display: "flex",
@@ -47,9 +58,16 @@ function TaskItem({
           justifyContent: "space-between",
         }}
       >
-        {/* Left: Check + Text */}
-        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1.2 }}>
-          {/* Checkbox-like completion circle */}
+        {/* Left: Checkbox + Content */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 1.2,
+            width: "100%",
+          }}
+        >
+          {/* Completion circle */}
           <button
             style={{ border: "none", backgroundColor: "inherit" }}
             onClick={() => handleCompleteTask(task)}
@@ -65,15 +83,24 @@ function TaskItem({
             />
           </button>
 
-          {/* Task description and tags */}
-          <Box>
+          {/* Description and Tags */}
+          <Box sx={{ width: "100%" }}>
             <EditableTaskTextField
               task={task}
+              inputRef={inputRef}
               handleUpdateDescription={handleUpdateDescription}
             />
 
-            {/* Tags: due date, assigned, completed */}
-            <Box sx={{ display: "flex", gap: 1, mt: 0.5, flexWrap: "wrap" }}>
+            {/* Chips */}
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                mt: 0.5,
+                flexWrap: "wrap",
+                width: "100%",
+              }}
+            >
               {task.dueDate && (
                 <Chip
                   size="small"
@@ -90,7 +117,11 @@ function TaskItem({
                 <Chip
                   size="small"
                   label={task.assignedTo.name}
-                  sx={{ bgcolor: "#e3f2fd", color: "#1976d2", borderRadius: 1 }}
+                  sx={{
+                    bgcolor: "#e3f2fd",
+                    color: "#1976d2",
+                    borderRadius: 1,
+                  }}
                 />
               )}
               {task.complete && (
@@ -106,7 +137,7 @@ function TaskItem({
         </Box>
       </Box>
 
-      {/* Bottom: Hover buttons (hidden unless hovered) */}
+      {/* Bottom Action Row */}
       <Box
         sx={{
           display: "flex",
@@ -114,32 +145,53 @@ function TaskItem({
           alignItems: "center",
           gap: 1,
           mt: 1,
-          minHeight: 36, // Reserve space even when not shown
+          minHeight: 36,
           visibility: isHovered ? "visible" : "hidden",
         }}
       >
-        <SearchUserByEmailInput
-          handleAssignTask={handleAssignTask}
-          task={task}
-        />
+        <SearchUserByName handleAssignTask={handleAssignTask} task={task} />
 
+        {/* Due Date Input */}
         <Tooltip title="Set Due Date">
-          <IconButton size="small" onClick={() => setOpenDateInput((p) => !p)}>
+          <IconButton
+            size="small"
+            onClick={() => setOpenDateInput((prev) => !prev)}
+          >
             <Event fontSize="small" />
           </IconButton>
         </Tooltip>
 
         {openDateInput && (
-          <div>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <input
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
+              style={{
+                fontSize: "1rem",
+                padding: "4px 6px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+              }}
             />
-            <button onClick={() => handleAssignDueDate(task._id, dueDate)}>
-              set
+            <button
+              onClick={() => {
+                handleAssignDueDate(task._id, dueDate);
+                setOpenDateInput(false);
+              }}
+              style={{
+                fontSize: "1rem",
+                padding: "4px 10px",
+                border: "1px solid #1976d2",
+                backgroundColor: "#1976d2",
+                color: "#fff",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Set
             </button>
-          </div>
+          </Box>
         )}
 
         <Tooltip title="Delete Task">

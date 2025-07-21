@@ -39,7 +39,9 @@ export const updateTask = async (
   id: string,
   data: UpdateTask
 ): Promise<ITask> => {
-  const task = await Task.findByIdAndUpdate(id, data, { new: true });
+  const task = await Task.findByIdAndUpdate(id, data, { new: true }).populate(
+    "assignedTo"
+  );
   if (!task) {
     throw new Error("No task found with given id");
   }
@@ -64,18 +66,22 @@ export const deleteTask = async (id: string): Promise<null> => {
   return null;
 };
 
-export const getDueTasksOnDate = async (date: string): Promise<ITask[]> => {
+export const getDueTasksOnDate = async (
+  user: string,
+  date: string
+): Promise<ITask[]> => {
   const start = new Date(date);
   start.setHours(0, 0, 0, 0);
   const end = new Date(date);
   end.setHours(23, 59, 59, 999);
 
   const tasks = await Task.find({
+    $or: [{ user: user }, { assignedTo: user }],
     dueDate: {
       $gte: start,
       $lte: end,
     },
-  });
+  }).populate("assignedTo");
 
   return tasks;
 };

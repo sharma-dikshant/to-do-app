@@ -15,8 +15,8 @@ import {
 import { PersonAddAlt } from "@mui/icons-material";
 import API_SERVICES from "../services/apiServices";
 
-function SearchUserByEmailInput({ task, handleAssignTask }) {
-  const [email, setEmail] = useState("");
+function SearchUserByName({ task, handleAssignTask }) {
+  const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ function SearchUserByEmailInput({ task, handleAssignTask }) {
   const anchorRef = useRef(null);
 
   useEffect(() => {
-    if (!email) {
+    if (!name) {
       setUsers([]);
       setOpen(false);
       return;
@@ -32,7 +32,7 @@ function SearchUserByEmailInput({ task, handleAssignTask }) {
 
     const delayDebounce = setTimeout(() => {
       setLoading(true);
-      API_SERVICES.USER.SEARCH_BY_EMAIL(email, (res) => {
+      API_SERVICES.USER.SEARCH_BY_NAME(name, (res) => {
         setUsers(res || []);
         setLoading(false);
         setOpen(true);
@@ -40,10 +40,10 @@ function SearchUserByEmailInput({ task, handleAssignTask }) {
     }, 400);
 
     return () => clearTimeout(delayDebounce);
-  }, [email]);
+  }, [name]);
 
   const handleSelect = (user) => {
-    setEmail(user.email);
+    setName(user.name);
     setSelectedUser(user);
     setOpen(false);
   };
@@ -51,12 +51,12 @@ function SearchUserByEmailInput({ task, handleAssignTask }) {
   const handleAssign = () => {
     if (!selectedUser) return;
     handleAssignTask?.(task._id, selectedUser._id);
-    setEmail("");
+    setName("");
     setSelectedUser(null);
   };
 
   const handleClickAway = () => {
-    setEmail("");
+    setName("");
     setSelectedUser(null);
     setOpen(false);
   };
@@ -68,9 +68,9 @@ function SearchUserByEmailInput({ task, handleAssignTask }) {
           <TextField
             size="small"
             inputRef={anchorRef}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Assign by email"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Assign by name"
             fullWidth
           />
 
@@ -95,8 +95,8 @@ function SearchUserByEmailInput({ task, handleAssignTask }) {
                       onClick={() => handleSelect(user)}
                     >
                       <ListItemText
-                        primary={user.email}
-                        primaryTypographyProps={{ fontSize: "0.75rem" }}
+                        primary={user.name}
+                        secondary={user.email}
                       />
                     </ListItemButton>
                   ))}
@@ -122,4 +122,4 @@ function SearchUserByEmailInput({ task, handleAssignTask }) {
   );
 }
 
-export default SearchUserByEmailInput;
+export default SearchUserByName;
