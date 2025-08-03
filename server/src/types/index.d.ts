@@ -7,5 +7,6 @@ export interface AuthenticatedRequest extends Request {
     _id: string;
     email?: string;
     name?: string;
+    defaultView?: string;
   };
 }

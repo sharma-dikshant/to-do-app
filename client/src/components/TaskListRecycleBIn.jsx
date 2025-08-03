@@ -26,7 +26,7 @@ function TaskListRecycleBin({ taskLists, setTaskLists }) {
   };
 
   const handlePermanentDelete = (id) => {
-    console.log("Delete forever", id);
+    API_SERVICES.TASK_LIST.PERMANENT_DELETE(id, setR_TaskLists);
   };
 
   return (

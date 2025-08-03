@@ -6,6 +6,12 @@ import {
   Fab,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { useEffect, useState } from "react";
@@ -16,8 +22,13 @@ import DeletedTaskListView from "./DeletedTaskListView";
 function Tasks({ taskList, setTaskLists }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [tasks, setTasks] = useState([]);
   const [isDeleted, setIsDeleted] = useState(false);
+
+  // NEW STATE
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newTaskDescription, setNewTaskDescription] = useState("");
 
   useEffect(() => {
     setIsDeleted(!taskList);
@@ -50,14 +61,32 @@ function Tasks({ taskList, setTaskLists }) {
     API_SERVICES.TASK.UPDATE(taskId, { assignedTo: userId }, setTasks);
   };
 
+  const handleAssignTaskToLocal = (taskId, user) => {
+    API_SERVICES.TASK.ASSIGN_TO_LOCAL(taskId, user, setTasks);
+  };
+
+  // Triggered by the FAB
   const handleAddNewTask = () => {
+    setNewTaskDescription(""); // clear input
+    setOpenDialog(true); // open dialog
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
+  const handleDialogSave = () => {
+    if (!newTaskDescription.trim()) return;
+
     API_SERVICES.TASK.CREATE(
       {
-        description: "untitled",
+        description: newTaskDescription.trim(),
         taskList: taskList._id,
       },
       setTasks
     );
+
+    setOpenDialog(false);
   };
 
   const handleDeleteList = async () => {
@@ -69,31 +98,34 @@ function Tasks({ taskList, setTaskLists }) {
     }
   };
 
-  // Show deleted task list UI
   if (isDeleted) return <DeletedTaskListView />;
 
   return (
     <Box
       sx={{
-        width: "80%",
-        // maxWidth: "900px",
+        width: "100%",
+        maxWidth: 1000,
         mx: "auto",
-        px: isMobile ? 2 : 4,
-        py: isMobile ? 2 : 4,
+        px: isMobile ? 0 : 4,
+        py: isMobile ? 0 : 4,
+        pb: "100px",
+        overflowX: "hidden",
       }}
     >
-      {/* Header: Title and Delete Button */}
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: "wrap",
           mb: 3,
         }}
       >
         <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold">
           {taskList?.name || "Inbox"}
         </Typography>
+
         <Tooltip title="Delete Task List">
           <IconButton onClick={handleDeleteList}>
             <Delete color="error" />
@@ -113,26 +145,63 @@ function Tasks({ taskList, setTaskLists }) {
               handleUpdateDescription={handleUpdateDescription}
               handleAssignTask={handleAssignTask}
               handleAssignDueDate={handleAssignDueDate}
+              handleAssignTaskToLocal={handleAssignTaskToLocal}
             />
           ))
         ) : (
-          <Typography variant="body1" color="text.secondary">
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mt: 2, textAlign: "center" }}
+          >
             No tasks yet.
           </Typography>
         )}
       </Box>
 
-      {/* Add Task Button (FAB) */}
-      <Box mt={3}>
+      {/* Add Task Button */}
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: isMobile ? 24 : 48,
+          right: isMobile ? 24 : 64,
+          zIndex: 1200,
+        }}
+      >
         <Fab
           color="primary"
           onClick={handleAddNewTask}
           aria-label="Add Task"
-          sx={{ boxShadow: 2, px: 2 }}
+          sx={{ px: 2, boxShadow: 4 }}
         >
           <Add />
         </Fab>
       </Box>
+
+      {/* Dialog for Task Description */}
+      <Dialog open={openDialog} onClose={handleDialogClose} fullWidth>
+        <DialogTitle>New Task</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            autoFocus
+            label="Task Description"
+            value={newTaskDescription}
+            onChange={(e) => setNewTaskDescription(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleDialogSave();
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleDialogSave} variant="contained">
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

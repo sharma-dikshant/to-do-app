@@ -50,7 +50,8 @@ export const handleSoftDeleteTaskList = catchAsync(
     if (!taskList) {
       return next(new AppError("no list found with given id", 400));
     }
-    if (taskList.user.toString() !== req.user._id) {
+
+    if (taskList.user.toString() !== req.user._id.toString()) {
       return next(new AppError("you can only delete your lists", 403));
     }
 
@@ -77,8 +78,8 @@ export const handlePermanentDelete = catchAsync(
       return next(new AppError("no list found with given id", 404));
     }
 
-    if (taskList.user._id.toString() !== req.user._id) {
-      return next(new AppError("you can only restore your lists", 403));
+    if (taskList.user._id.toString() !== req.user._id.toString()) {
+      return next(new AppError("you can only delete your lists", 403));
     }
 
     // restore all tasks of this list
@@ -89,7 +90,7 @@ export const handlePermanentDelete = catchAsync(
 
     await permanentDeleteTaskList(taskListId);
 
-    return new APIResponse(204, "success", null);
+    return new APIResponse(204, "success", null).send(res);
   }
 );
 
@@ -102,7 +103,7 @@ export const handleRestoreTaskList = catchAsync(
       return next(new AppError("no list found with given id", 404));
     }
 
-    if (taskList.user._id.toString() !== req.user._id) {
+    if (taskList.user._id.toString() !== req.user._id.toString()) {
       return next(new AppError("you can only restore your lists", 403));
     }
 

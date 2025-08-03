@@ -6,197 +6,151 @@ import {
   ListItemText,
   Divider,
   Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Add,
-  Inbox,
   Today,
   CalendarMonth,
   CheckCircle,
-  GroupAdd,
-  Help,
-  Tag,
   Delete,
   Logout,
+  Home,
+  Inbox,
 } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import API_SERVICES from "../services/apiServices";
-import { useRouteLoaderData } from "react-router-dom";
 
 function Sidebar({
   setSelectedOption,
   selectedOption,
-  setSelectedList,
-  taskLists,
   setTaskLists,
   user,
+  onCloseDrawer,
+  taskLists,
+  setSelectedList,
 }) {
   const [openDialog, setOpenDialog] = useState(false);
   const [newListName, setNewListName] = useState("");
+  const inputRef = useRef();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
-    API_SERVICES.TASK_LIST.ALL_LIST_OF_USER(user._id, setTaskLists);
-  }, []);
+    if (openDialog && inputRef.current) {
+      setTimeout(() => inputRef.current.focus(), 100);
+    }
+  }, [openDialog]);
 
   function handleCreateNewTaskList() {
     if (!newListName.trim()) return;
     const data = { name: newListName };
     API_SERVICES.TASK_LIST.CREATE(setTaskLists, data);
-    newListName("");
+    setNewListName("");
+  }
+
+  function handleSelect(option) {
+    setSelectedOption(option);
+    if (onCloseDrawer) onCloseDrawer(); // Automatically close sidebar
   }
 
   return (
-    <>
-      <Box
-        sx={{
-          p: 2,
-          // width: '80%',
-          backgroundColor: "#f0e9e056",
-          height: "100%",
-          color: "#752703ff",
-          fontWeight: "800",
-        }}
-      >
-        <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
-          {user.name?.split(" ")[0] || "Welcome"}
-        </Typography>
+    <Box
+      sx={{
+        p: 2,
+        py: isMobile ? "80px" : "10px",
+        backgroundColor: "#f0e9e056",
+        height: "100%",
+        color: "#752703ff",
+        fontWeight: "800",
+        width: "100%",
+      }}
+    >
+      <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+        {user?.name?.split(" ")[0] || "Welcome"}
+      </Typography>
 
-        <List>
-          {/* Add new task list */}
+      <List>
+        <ListItemButton
+          selected={selectedOption === "home"}
+          onClick={() => handleSelect("home")}
+        >
+          <ListItemIcon>
+            <Home />
+          </ListItemIcon>
+          <ListItemText primary="Home" />
+        </ListItemButton>
+
+        <ListItemButton
+          selected={selectedOption === "today"}
+          onClick={() => handleSelect("today")}
+        >
+          <ListItemIcon>
+            <Today />
+          </ListItemIcon>
+          <ListItemText primary="Today" />
+        </ListItemButton>
+
+        <ListItemButton
+          selected={selectedOption === "calender"}
+          onClick={() => handleSelect("calender")}
+        >
+          <ListItemIcon>
+            <CalendarMonth />
+          </ListItemIcon>
+          <ListItemText primary="Calendar" />
+        </ListItemButton>
+
+        <ListItemButton
+          selected={selectedOption === "assigned"}
+          onClick={() => handleSelect("assigned")}
+        >
+          <ListItemIcon>
+            <CheckCircle />
+          </ListItemIcon>
+          <ListItemText primary="Assigned" />
+        </ListItemButton>
+
+        {/* Task Lists */}
+        {taskLists.map((taskList, i) => (
           <ListItemButton
-            selected={selectedOption === "new-task-list"}
+            selected={selectedOption === taskList.name}
             onClick={() => {
-              setOpenDialog(true);
-              setSelectedOption("new-task-list");
+              handleSelect(taskList.name);
+              setSelectedList(taskList);
             }}
+            key={i}
           >
             <ListItemIcon>
-              <Add />
+              <Inbox />
             </ListItemIcon>
-            <ListItemText primary="Add TaskList" />
+            <ListItemText primary={taskList.name} />
           </ListItemButton>
+        ))}
 
-          {/* Task Lists */}
-          {taskLists.map((taskList, i) => (
-            <ListItemButton
-              selected={selectedOption === taskList.name}
-              onClick={() => {
-                setSelectedOption(taskList.name);
-                setSelectedList(taskList);
-              }}
-              key={i}
-            >
-              <ListItemIcon>
-                <Inbox />
-              </ListItemIcon>
-              <ListItemText primary={taskList.name} />
-            </ListItemButton>
-          ))}
+        <ListItemButton
+          selected={selectedOption === "recycle-bin"}
+          onClick={() => handleSelect("recycle-bin")}
+        >
+          <ListItemIcon>
+            <Delete />
+          </ListItemIcon>
+          <ListItemText primary="Recycle Bin" />
+        </ListItemButton>
+      </List>
 
-          {/* Today */}
-          <ListItemButton
-            selected={selectedOption === "today"}
-            onClick={() => setSelectedOption("today")}
-          >
-            <ListItemIcon>
-              <Today />
-            </ListItemIcon>
-            <ListItemText primary="Today" />
-          </ListItemButton>
+      <Divider sx={{ my: 2 }} />
 
-          {/* Upcoming */}
-          <ListItemButton
-            selected={selectedOption === "calender"}
-            onClick={() => setSelectedOption("calender")}
-          >
-            <ListItemIcon>
-              <CalendarMonth />
-            </ListItemIcon>
-            <ListItemText primary="Upcoming" />
-          </ListItemButton>
-
-          {/* Assigned */}
-          <ListItemButton
-            selected={selectedOption === "assigned"}
-            onClick={() => setSelectedOption("assigned")}
-          >
-            <ListItemIcon>
-              <CheckCircle />
-            </ListItemIcon>
-            <ListItemText primary="Assigned" />
-          </ListItemButton>
-
-          {/* Recycle Bin */}
-          <ListItemButton
-            selected={selectedOption === "recyle-bin"}
-            onClick={() => setSelectedOption("recycle-bin")}
-          >
-            <ListItemIcon>
-              <Delete />
-            </ListItemIcon>
-            <ListItemText primary="Recycle Bin" />
-          </ListItemButton>
-        </List>
-
-        {/* <Divider sx={{ my: 2 }} />
-        <Typography variant="subtitle2" sx={{ ml: 2, mb: 1 }}>
-          My Projects
-        </Typography>
-        <List>
-          <ListItemButton>
-            <ListItemIcon>
-              <Tag />
-            </ListItemIcon>
-            <ListItemText primary="Getting Started 👋" secondary="13" />
-          </ListItemButton>
-        </List> */}
-
-        <Divider sx={{ my: 2 }} />
-        <List>
-          {/* <ListItemButton>
-            <ListItemIcon>
-              <GroupAdd />
-            </ListItemIcon>
-            <ListItemText primary="Add a team" />
-          </ListItemButton> */}
-          <ListItemButton onClick={API_SERVICES.AUTH.LOGOUT}>
-            <ListItemIcon>
-              <Logout />
-            </ListItemIcon>
-            <ListItemText primary="Logout" />
-          </ListItemButton>
-        </List>
-      </Box>
-
-      {/* Create New Task List Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Create New Task List</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Task List Name"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={newListName}
-            onChange={(e) => setNewListName(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleCreateNewTaskList} variant="contained">
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+      <List>
+        <ListItemButton onClick={API_SERVICES.AUTH.LOGOUT}>
+          <ListItemIcon>
+            <Logout />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </ListItemButton>
+      </List>
+    </Box>
   );
 }
 

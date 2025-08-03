@@ -8,6 +8,7 @@ import {
   updateTask,
   getDueTasksOnDate,
   getMonthTasks,
+  assignTaskToLocal,
 } from "../services/task.service";
 import { isValidObjectId, Types } from "mongoose";
 import { AuthenticatedRequest } from "../types";
@@ -117,5 +118,16 @@ export const handleGetMonthTasks = catchAsync(
       Number(year)
     );
     return new APIResponse(200, "success", tasks).send(res);
+  }
+);
+
+export const handleAssignTaskToLocal = catchAsync(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const { name } = req.body;
+    const { taskId } = req.params;
+
+    const task = await assignTaskToLocal(taskId, name);
+
+    return new APIResponse(200, "success", task).send(res);
   }
 );

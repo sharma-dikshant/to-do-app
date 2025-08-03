@@ -8,6 +8,7 @@ import {
   handleUpdateBasicDetails,
   handleGetDueTasks,
   handleGetMonthTasks,
+  handleAssignTaskToLocal,
 } from "../controllers/task.controller";
 import { protect } from "../controllers/auth.controller";
 
@@ -23,5 +24,7 @@ router.get("/assigned/me", handleGetAllAssignedTasks);
 router.get("/task-lists/:taskListId", handleGetAllTasksOfTaskList);
 router.get("/due", handleGetDueTasks);
 router.get("/year/:year/month/:month", handleGetMonthTasks);
+
+router.post("/assign/locals/:taskId", handleAssignTaskToLocal);
 
 export default router;

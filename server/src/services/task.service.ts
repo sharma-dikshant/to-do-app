@@ -1,6 +1,7 @@
 import { Task, ITask } from "../models/task.model";
 import { Types } from "mongoose";
 import AppError from "../utils/appError";
+import { User } from "../models/user.model";
 
 interface CreateTaskInput {
   description: string;
@@ -103,11 +104,20 @@ export const getMonthTasks = async (
   const tasks = await Task.find({
     //@ts-ignore
     $or: [{ user: user }, { assignedTo: user }],
-    createdAt: {
+    dueDate: {
       $gte: start,
       $lt: end,
     },
   });
 
   return tasks;
+};
+
+export const assignTaskToLocal = async (id: string, user: string) => {
+  const task = await Task.findByIdAndUpdate(
+    id,
+    { assignedToLocal: user },
+    { new: true }
+  );
+  return task;
 };

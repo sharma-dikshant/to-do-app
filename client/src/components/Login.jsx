@@ -4,7 +4,6 @@ import axios from "axios";
 import { API_ROUTES } from "../services/api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { setCookies } from "../../utils/setCookies";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,7 +18,6 @@ const Login = () => {
         { email, password },
         { withCredentials: true }
       );
-      setCookies("authToken", response.data.data.token);
       toast.success("logined In");
       navigate("/");
     } catch (error) {

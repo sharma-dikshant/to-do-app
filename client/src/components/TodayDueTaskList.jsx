@@ -39,10 +39,10 @@ function TodayDueTaskList() {
   return (
     <Box
       sx={{
-        width: "80%",
+        width: "100%",
         mx: "auto",
-        px: isMobile ? 2 : 4,
-        py: isMobile ? 2 : 4,
+        px: isMobile ? 0 : 4,
+        py: isMobile ? 0 : 4,
       }}
     >
       {/* Header: Title and Delete Button */}

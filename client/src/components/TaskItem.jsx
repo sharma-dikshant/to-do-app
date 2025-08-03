@@ -1,4 +1,12 @@
-import { Box, Typography, IconButton, Tooltip, Chip } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Chip,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 import { Delete, PersonAddAlt, Event } from "@mui/icons-material";
 import { useEffect, useRef, useState } from "react";
 import EditableTaskTextField from "./EditableTaskTextField";
@@ -20,7 +28,10 @@ function TaskItem({
   handleUpdateDescription,
   handleAssignTask,
   handleAssignDueDate,
+  handleAssignTaskToLocal,
 }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isHovered, setIsHovered] = useState(false);
   const [openDateInput, setOpenDateInput] = useState(false);
   const [dueDate, setDueDate] = useState(
@@ -44,7 +55,7 @@ function TaskItem({
       sx={{
         display: "flex",
         flexDirection: "column",
-        py: 3,
+        py: 4,
         px: 1,
         borderBottom: "1px solid #eee",
         opacity: task.complete ? 0.5 : 1,
@@ -113,10 +124,21 @@ function TaskItem({
                   }}
                 />
               )}
-              {task.assignedTo && (
+              {/* {task.assignedTo && (
                 <Chip
                   size="small"
                   label={task.assignedTo.name}
+                  sx={{
+                    bgcolor: "#e3f2fd",
+                    color: "#1976d2",
+                    borderRadius: 1,
+                  }}
+                />
+              )} */}
+              {task.assignedToLocal && (
+                <Chip
+                  size="small"
+                  label={task.assignedToLocal}
                   sx={{
                     bgcolor: "#e3f2fd",
                     color: "#1976d2",
@@ -149,7 +171,11 @@ function TaskItem({
           visibility: isHovered ? "visible" : "hidden",
         }}
       >
-        <SearchUserByName handleAssignTask={handleAssignTask} task={task} />
+        <SearchUserByName
+          handleAssignTask={handleAssignTask}
+          handleAssignTaskToLocal={handleAssignTaskToLocal}
+          task={task}
+        />
 
         {/* Due Date Input */}
         <Tooltip title="Set Due Date">

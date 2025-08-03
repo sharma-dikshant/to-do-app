@@ -5,6 +5,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   passwordConfirm?: string;
+  localUsers?: string[];
+  defaultView?: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -33,10 +35,16 @@ const userSchema = new Schema<IUser>({
       message: "password and password confirm is not same",
     },
   },
+  localUsers: [
+    {
+      type: String,
+      lowercase: true,
+    },
+  ],
+  defaultView: String,
 });
 
 userSchema.pre("save", async function (next) {
-  // const hashedPassward = await
   const hashedPassword = await bcrypt.hash(this.password, 12);
   this.password = hashedPassword;
   this.passwordConfirm = undefined;

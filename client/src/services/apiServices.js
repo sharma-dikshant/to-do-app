@@ -5,6 +5,28 @@ import { redirect } from "react-router-dom";
 
 const API_SERVICES = {
   USER: {
+    CREATE_LOCAL_USER: async (user) => {
+      try {
+        const response = await axios.post(API_ROUTES.USER.CREATE_LOCAL, user, {
+          withCredentials: true,
+        });
+      } catch (error) {
+        toast.error("failed to create local user");
+      }
+    },
+    UPDATE_MY_DETAILS: async (updatedUser) => {
+      try {
+        const response = await axios.patch(
+          API_ROUTES.USER.UPDATE_ME,
+          updatedUser,
+          {
+            withCredentials: true,
+          }
+        );
+      } catch (error) {
+        toast.error("failed to create local user");
+      }
+    },
     SEARCH_BY_EMAIL: async (q, setUsers) => {
       try {
         const response = await axios.get(API_ROUTES.USER.SEARCH_BY_EMAIL(q), {
@@ -20,6 +42,19 @@ const API_SERVICES = {
         const response = await axios.get(API_ROUTES.USER.SEARCH_BY_NAME(q), {
           withCredentials: true,
         });
+        setUsers(response.data.data || []);
+      } catch (error) {
+        toast.error("failed to find user!");
+      }
+    },
+    SEARCH_LOCALS_BY_NAME: async (q, setUsers) => {
+      try {
+        const response = await axios.get(
+          API_ROUTES.USER.SEARCH_LOCAL_BY_NAME(q),
+          {
+            withCredentials: true,
+          }
+        );
         setUsers(response.data.data || []);
       } catch (error) {
         toast.error("failed to find user!");
@@ -64,6 +99,19 @@ const API_SERVICES = {
     SOFT_DELETE: async (taskListId, setTaskList) => {
       try {
         await axios.delete(API_ROUTES.TASK_LIST.SOFT_DELETE(taskListId), {
+          withCredentials: true,
+        });
+        toast.success("successfully removed");
+        if (setTaskList)
+          setTaskList((p) => p.filter((t) => t._id !== taskListId));
+      } catch (error) {
+        console.log(error);
+        toast.error("failed to remove taskList");
+      }
+    },
+    PERMANENT_DELETE: async (taskListId, setTaskList) => {
+      try {
+        await axios.delete(API_ROUTES.TASK_LIST.PERMANENT_DELETE(taskListId), {
           withCredentials: true,
         });
         toast.success("successfully removed");
@@ -171,6 +219,20 @@ const API_SERVICES = {
         setTasks(response.data.data || []);
       } catch (error) {
         toast.error("failed to fetch month plan");
+      }
+    },
+    ASSIGN_TO_LOCAL: async (taskId, user, setTasks) => {
+      try {
+        const response = await axios.post(
+          API_ROUTES.TASK.ASSIGN_TO_LOCAL(taskId),
+          { name: user },
+          { withCredentials: true }
+        );
+        setTasks((prevTasks) =>
+          prevTasks.map((t) => (t._id === taskId ? response.data.data : t))
+        );
+      } catch (error) {
+        toast.error("failed to assign");
       }
     },
   },

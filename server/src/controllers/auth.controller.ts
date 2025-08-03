@@ -120,16 +120,20 @@ export const protect = catchAsync(
 
       const decoded = jwt.verify(token, secret_key) as {
         _id: string;
-        email?: string;
-        name?: string;
+        email: string;
+        name: string;
+        defaultView?: string;
       };
 
-      //TODO also verify the user in the token
       if (decoded) {
+        const user = await getUser(decoded.email);
+        if (!user)
+          return next(new AppError("User doesnt exist with given token", 400));
         req.user = {
-          _id: decoded._id,
-          email: decoded.email,
-          name: decoded.name,
+          _id: user._id as string,
+          email: user.email,
+          name: user.name,
+          defaultView: user.defaultView,
         };
       } else {
         return next(new AppError("please login again to continue", 403));

@@ -15,16 +15,16 @@ import {
 import { PersonAddAlt } from "@mui/icons-material";
 import API_SERVICES from "../services/apiServices";
 
-function SearchUserByName({ task, handleAssignTask }) {
+function SearchUserByName({ task, handleAssignTaskToLocal }) {
   const [name, setName] = useState("");
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedName, setSelectedName] = useState(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
 
   useEffect(() => {
-    if (!name) {
+    if (!name.trim()) {
       setUsers([]);
       setOpen(false);
       return;
@@ -32,7 +32,7 @@ function SearchUserByName({ task, handleAssignTask }) {
 
     const delayDebounce = setTimeout(() => {
       setLoading(true);
-      API_SERVICES.USER.SEARCH_BY_NAME(name, (res) => {
+      API_SERVICES.USER.SEARCH_LOCALS_BY_NAME(name, (res) => {
         setUsers(res || []);
         setLoading(false);
         setOpen(true);
@@ -42,46 +42,74 @@ function SearchUserByName({ task, handleAssignTask }) {
     return () => clearTimeout(delayDebounce);
   }, [name]);
 
-  const handleSelect = (user) => {
-    setName(user.name);
-    setSelectedUser(user);
+  const handleSelect = (username) => {
+    setName(username);
+    setSelectedName(username);
     setOpen(false);
   };
 
   const handleAssign = () => {
-    if (!selectedUser) return;
-    handleAssignTask?.(task._id, selectedUser._id);
+    if (!selectedName) return;
+    handleAssignTaskToLocal(task._id, selectedName);
     setName("");
-    setSelectedUser(null);
+    setSelectedName(null);
+    setOpen(false);
+  };
+
+  const handleCreateNewUser = async () => {
+    if (!name.trim() || users.includes(name)) return;
+
+    try {
+      await API_SERVICES.USER.CREATE_LOCAL_USER({ name });
+      handleAssignTaskToLocal(task._id, name);
+    } catch (error) {
+      console.error("Error creating local user:", error);
+    }
+
+    setName("");
+    setSelectedName(null);
+    setOpen(false);
   };
 
   const handleClickAway = () => {
-    setName("");
-    setSelectedUser(null);
     setOpen(false);
   };
+
+  const nameExists = users.includes(name);
 
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <ClickAwayListener onClickAway={handleClickAway}>
-        <Box sx={{ position: "relative", width: "200px" }}>
+        <Box sx={{ position: "relative", width: 200 }}>
           <TextField
             size="small"
             inputRef={anchorRef}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setSelectedName(null);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (nameExists) {
+                  handleAssign();
+                } else {
+                  handleCreateNewUser();
+                }
+              }
+            }}
             placeholder="Assign by name"
             fullWidth
           />
 
           <Popper
-            open={open && users.length > 0}
+            open={open && name.trim().length > 0}
             anchorEl={anchorRef.current}
             placement="bottom-start"
             style={{ zIndex: 9999 }}
           >
             <Paper
-              sx={{ mt: 1, width: 200, maxHeight: 200, overflowY: "auto" }}
+              sx={{ mt: 1, width: 200, maxHeight: 250, overflowY: "auto" }}
             >
               {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", p: 1 }}>
@@ -89,17 +117,29 @@ function SearchUserByName({ task, handleAssignTask }) {
                 </Box>
               ) : (
                 <List dense>
-                  {users.map((user, idx) => (
+                  {users.map((username, idx) => (
                     <ListItemButton
                       key={idx}
-                      onClick={() => handleSelect(user)}
+                      onClick={() => handleSelect(username)}
                     >
                       <ListItemText
-                        primary={user.name}
-                        secondary={user.email}
+                        primary={username}
+                        primaryTypographyProps={{ fontSize: "0.75rem" }}
                       />
                     </ListItemButton>
                   ))}
+
+                  {!nameExists && (
+                    <ListItemButton onClick={handleCreateNewUser}>
+                      <ListItemText
+                        primary={`Create "${name}"`}
+                        primaryTypographyProps={{
+                          fontSize: "0.75rem",
+                          fontStyle: "italic",
+                        }}
+                      />
+                    </ListItemButton>
+                  )}
                 </List>
               )}
             </Paper>
@@ -112,7 +152,7 @@ function SearchUserByName({ task, handleAssignTask }) {
           <IconButton
             size="small"
             onClick={handleAssign}
-            disabled={!selectedUser}
+            disabled={!selectedName}
           >
             <PersonAddAlt fontSize="small" />
           </IconButton>

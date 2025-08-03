@@ -5,6 +5,7 @@ export interface ITask extends Document {
   user: Types.ObjectId;
   taskList: Types.ObjectId;
   assignedTo?: Types.ObjectId;
+  assignedToLocal?: string;
   dueDate?: Date;
   active: boolean;
   complete: boolean;
@@ -29,6 +30,9 @@ const taskSchema = new Schema<ITask>(
     assignedTo: {
       type: Schema.Types.ObjectId,
       ref: "User",
+    },
+    assignedToLocal: {
+      type: String,
     },
     dueDate: {
       type: Date,
